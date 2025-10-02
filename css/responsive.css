@@ -1,0 +1,166 @@
+/** media 1200px**/
+@media screen and (max-width: 1200px) {
+    .dashboard-container {
+        grid-template-columns: 1fr 6f 5fr;
+        gap: 2rem;
+    }
+    .main-sidebar {
+        width: auto;
+        padding-left: 4px;
+    }
+    .main-container .recent-orders {
+        position: absolute;
+        width: 85px;
+        padding-bottom: 4rem;
+    }
+    .main-container .inside {
+        grid-template-columns: 1fr;
+    }
+    .aside-header .brand {
+        padding-left: 1rem;
+    }
+    .brand p {
+        display: none;
+    }
+    .sidebar .item span:not(.material-icons-sharp) {
+        display: none;
+    }
+    .sidebar .item span.message-count {
+        display: flex;
+    }
+    .list-items .item a {
+        gap: 10px;
+        padding: 16px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .list-items li:last-child {
+        position: initial;
+        margin-top: 4rem;
+    }
+}
+/**media 768px**/
+@media screen and (max-width: 768px) {
+    .main-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    }
+    /* Rends le titre toujours visible et centré sur mobile */
+  .main-title {
+    display: block !important;
+    font-size: 1.5rem !important;
+    text-align: center !important;
+    padding-top: 30px !important;
+    color: var(--text-color-primary) !important;
+    background: none !important;
+  }
+    .main-sidebar {
+        display: block;
+        position: fixed;
+        background-color: var(--white);
+        width: 300px;
+        padding-left: 4px;
+        box-shadow: var(--box-sidebar);
+        padding-right: 1rem;
+        left: -100%;
+        width: auto;
+        z-index: 10;
+        transition: .3s cubic-bezier(0.39, 0.575, 0.565, 1);
+    }
+     .aside-header .close {
+        display: inline;
+        padding: 4px;
+        transition: 0.3s ease-in-out;
+     }
+     .aside-header .close:hover {
+        cursor: pointer;
+        background-color: var(--yellow);
+     }
+     .brand {
+      display: inline;
+      font-size: 20px;
+     }
+     .brand img {
+        width: 40px;
+        height: 40px;
+     }
+     .sidebar .item a {
+        justify-content: start;
+        gap: 20px;
+        padding-left: 3rem;
+     }
+
+     .sidebar .item a span {
+        display: inline !important;
+     }
+     .dashboard-container {
+        grid-template-columns: 1fr;
+        grid-template-areas: 'main';
+     }
+    .main-container {
+        padding: 20px 40px !important;
+    } 
+    .main-header .main-title {
+        margin-bottom: 4rem;
+    }
+    .main-container .recent-orders {
+        position: inherit !important;
+        width: 100%;
+        padding-bottom: 2rem;
+    }
+    .main-container .inside {
+        grid-template-columns: 1fr;
+    }
+    .aside-header .brand {
+        padding-left: 3rem;
+    }
+    .brand p {
+        display: none;
+    }
+    .sidebar .item span:not(.material-icons-sharp) {
+        display: none;
+    }
+    .sidebar .item span.message-count {
+        display: flex;
+    }
+    .list-items .item a {
+        gap: 10px;
+        padding: 16px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .list-items li:last-child {
+        position: initial;
+        margin-top: 4rem;
+    }
+   
+    .header-right .toggle-menu-btn {
+        position: absolute;
+        left: 28px;
+        display: initial;
+        border: none;
+        color: var(--text-color-secondary);
+        background-color: var(--white);
+        padding: 4px;
+        transition: 0.3s ease-in-out;
+    }
+    .main-container .header-right{
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background-color: var(--white);
+        padding: 16px 32px;
+        gap: 10rem;
+        box-shadow: var(--box-sidebar);
+        transition: background-color 0.3s ease-in-out;
+    }
+
+    .header-right .toggle-menu-btn:hover {
+        background-color: var(--desaturate-cyan-2);
+        cursor: pointer;
+    }
+}

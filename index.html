@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord</title>
+  
+    <!--material icons-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp"
+      rel="stylesheet"/>
+   
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/responsive.css"/>
+   
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="main-sidebar">
+            <div class="aside-header">
+                <div class="brand">
+                 <img src="img/ceci.jpg" alt=""><br>
+                 <p>Salut, <strong>user</strong></p> 
+                </div> 
+                <div class="close" id="close">
+                    <span class="material-icons-sharp">
+                      close
+                    </span>
+                </div>
+                 <div class="toggle-theme">
+                            <span class="material-icons-sharp active">light_mode</span>
+                            <span class="material-icons-sharp">dark_mode</span>
+                 </div>
+            </div>
+            <div class="sidebar">
+                <ul class="list-items">
+                    <li class="item">
+                        <a href="" class="active">
+                            <span class="material-icons-sharp">dashboard</span>
+                            <span>Tableau de bord</span> 
+                        </a>
+                    </li>
+                    
+                     <li class="item">
+                        <a href="">
+                            <span class="material-icons-sharp">add_shopping_cart</span>
+                            <span>ajouter produit</span>
+                        </a>
+                    </li>                   
+                     <li class="item">
+                        <a href="">
+                            <span class="material-icons-sharp">shopping_cart_checkout</span>
+                            <span>Ventes</span>
+                        </a>
+                    </li>                    
+                    <li class="item">
+                        <a href="">
+                            <span class="material-icons-sharp">groups</span>
+                            <span>Fournisseurs</span>
+                        </a>
+                    </li>
+                    <li class="item">
+                        <a href="">
+                            <span class="material-icons-sharp">local_offer</span>
+                            <span>commande</span>
+                        </a>
+                    </li>
+                    <li class="item">
+                        <a href="">
+                            <span class="material-icons-sharp">person_add_alt</span>
+                            <span>Utilisateurs</span>
+                        </a>
+                    </li>
+                    <li class="item">
+                        <a href="">
+                            <span class="material-icons-sharp">history</span>
+                            <span>Historique</span>
+                        </a>
+                    </li>
+                    <li class="item">
+                        <a href="">
+                            <span class="material-icons-sharp">logout</span>
+                            <span>Deconnexion</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="main-container">
+            <div class="main-header">
+                <h1 class="main-title">Tableau de bord</h1>
+                <header class="header-right">
+                    <button class="toggle-menu-btn" id="openSidebar">
+                        <span class="material-icons-sharp">menu</span>
+                    </button>
+                </header>
+            </div>
+            <!--card-->
+            <div class="inside">
+                <div class="card">
+                    <div class="card-container">
+                        <div class="card-header">
+                            <span class="material-icons-sharp">
+                                bar_chart
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-info">
+                                <h3>Ventes totales</h3>
+                                <h1>210M</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-container">
+                        <div class="card-header">
+                            <span class="material-icons-sharp">
+                                currency_franc
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-info">
+                                <h3>Ventes journalieres</h3>
+                                <h1>210000 FCFA</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-container">
+                        <div class="card-header">
+                            <span class="material-icons-sharp">
+                                person_add
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-info">
+                                <h3>Utilisateurs actifs</h3>
+                                <h1>5 utilisateur(s)</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-container">
+                        <div class="card-header">
+                            <span class="material-icons-sharp">
+                                person_add_disabled
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-info">
+                                <h3>Utilisateurs bloqués</h3>
+                                <h1>1 utilisateur(S)</h1>
+                            </div>
+                        </div>
+                    </div>
+               </div>
+               <div class="card">
+                    <div class="card-container">
+                        <div class="card-header">
+                            <span class="material-icons-sharp">
+                                bar_chart
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-info">
+                                <h3>Reparations en attente</h3>
+                                <h1>2</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-container">
+                        <div class="card-header">
+                            <span class="material-icons-sharp">
+                                bar_chart
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-info">
+                                <h3>Reparations encours</h3>
+                                <h1>2</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-container">
+                        <div class="card-header">
+                            <span class="material-icons-sharp">
+                                bar_chart
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-info">
+                                <h3>Reparations terminées</h3>
+                                <h1>4</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
