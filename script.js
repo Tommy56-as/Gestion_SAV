@@ -60,5 +60,33 @@
         });
     });
 });
+        // Fonctionnalité d'affichage/masquage du mot de passe
+        function setupPasswordToggle(toggleId, passwordId) {
+            const toggle = document.getElementById(toggleId);
+            const passwordInput = document.getElementById(passwordId);
+            
+            toggle.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // Changer l'icône
+                const icon = this.querySelector('i');
+                icon.className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+            });
+        }
+        
+        // Configurer les boutons d'affichage/masquage
+        setupPasswordToggle('login-toggle', 'login-password');
+        
+        // Validation du formulaire
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                e.preventDefault();
+                alert('Veuillez remplir tous les champs obligatoires!');
+            }
+        });
 
 
