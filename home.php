@@ -18,6 +18,7 @@ $title = $page;
             if (file_exists($file)) {
                 include $file;
                 $title = $page."php";
+                
             } else {
     echo "<h2 style='padding:20px'>Page introuvable !</h2>";
       }

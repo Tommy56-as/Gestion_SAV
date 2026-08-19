@@ -1,6 +1,7 @@
 <?php
 require_once '../admin_auth.php';
 require_once '../../inc/Database.php';
+require_once '../../inc/history.php';
 
 header('Content-Type: application/json');
 
@@ -14,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
     }
-
+    
 $nom = trim($_POST['nom'] ?? '');
 $prenom = trim($_POST['prenom'] ?? '');
 $telephone = trim($_POST['telephone'] ?? '');
@@ -47,6 +48,7 @@ try {
         ':produit' => $produitLivre,
         ':statut' => $statut
     ]);
+    log_history($pdo, "Ajout du fournisseur {$nom} {$prenom}");
 
     echo json_encode([
         'success' => true,
@@ -59,8 +61,8 @@ try {
         'message' => 'Erreur serveur'
     ]);
 }
+}
 } else {
     http_response_code(405);
     echo json_encode(['success' => false, 'message' => 'Méthode non autorisée']);
-}
 }

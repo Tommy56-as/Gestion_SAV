@@ -1,64 +1,81 @@
-  document.addEventListener('DOMContentLoaded', function() {
-    const body = document.body;
-    const openSidebar = document.querySelector('#openSidebar');
-    const closeSidebar = document.querySelector('#close');
-    const toggleTheme = document.querySelector('.main-sidebar .toggle-theme');
-    const sidebar = document.querySelector('.main-sidebar');
+document.addEventListener("DOMContentLoaded", function () {
+  const body = document.body;
+  const openSidebar = document.querySelector("#openSidebar");
+  const closeSidebar = document.querySelector("#close");
+  const toggleTheme = document.querySelector(".main-sidebar .toggle-theme");
+  const sidebar = document.querySelector(".main-sidebar");
+
+  if (toggleTheme && sidebar) {
     const light = toggleTheme.children[0];
     const dark = toggleTheme.children[1];
-    
 
-    // Applique le thème sauvegardé au chargement
-    if (localStorage.getItem('theme') === 'dark') {
-      body.classList.add('dark-mode');
-      light.classList.remove('active');
-      dark.classList.add('active');
+    if (localStorage.getItem("theme") === "dark") {
+      body.classList.add("dark-mode");
+      light.classList.remove("active");
+      dark.classList.add("active");
     } else {
-      body.classList.remove('dark-mode');
-      light.classList.add('active');
-      dark.classList.remove('active');
+      light.classList.add("active");
+      dark.classList.remove("active");
     }
 
-    openSidebar.addEventListener('click', () => {
-      sidebar.style.left = '0%';
+    toggleTheme.addEventListener("click", function () {
+      const darkMode = body.classList.toggle("dark-mode");
+      light.classList.toggle("active", !darkMode);
+      dark.classList.toggle("active", darkMode);
+      localStorage.setItem("theme", darkMode ? "dark" : "light");
     });
-    closeSidebar.addEventListener('click', () => {
-      sidebar.style.left = '-100%';
+  }
+
+  if (openSidebar && sidebar) {
+    openSidebar.addEventListener("click", function () {
+      sidebar.style.left = "0%";
     });
+  }
 
-    toggleTheme.addEventListener('click', changeTheme);
+  if (closeSidebar && sidebar) {
+    closeSidebar.addEventListener("click", function () {
+      sidebar.style.left = "-100%";
+    });
+  }
 
-    function changeTheme() {
-      if (body.classList.contains('dark-mode')) {
-        body.classList.remove('dark-mode');
-        light.classList.add('active');
-        dark.classList.remove('active');
-        localStorage.setItem('theme', 'light');
-      } else {
-        body.classList.add('dark-mode');
-        light.classList.remove('active');
-        dark.classList.add('active');
-        localStorage.setItem('theme', 'dark');
-      }
+  const links = document.querySelectorAll("#sidebarMenu .item a");
+  const currentPage =
+    new URLSearchParams(window.location.search).get("page") || "dashboard";
+
+  links.forEach(function (link) {
+    const href = link.getAttribute("href") || "";
+    const match = href.match(/[?&]page=([^&]+)/);
+
+    if (match && match[1] === currentPage) {
+      link.classList.add("active");
     }
+
+    link.addEventListener("click", function () {
+      links.forEach(function (item) {
+        item.classList.remove("active");
+      });
+      link.classList.add("active");
+    });
   });
- document.addEventListener("DOMContentLoaded", function() {
-    const links = document.querySelectorAll("#sidebarMenu .item a");
-    let currentUrl = window.location.href;
-
-    // Vérifie l'URL courante et applique active
-    links.forEach(link => {
-        if (currentUrl.includes(link.getAttribute("href"))) {
-            link.classList.add("active");
-        }
-    });
-
-    // Gestion au clic
-    links.forEach(link => {
-        link.addEventListener("click", function() {
-            links.forEach(l => l.classList.remove("active")); // retire des autres
-            this.classList.add("active"); // applique sur celui cliqué
-        });
-    });
 });
 
+function showNotification(message, type = "success") {
+  const notification = document.getElementById("notification");
+
+  if (!notification) {
+    console.warn(`Notification element not found: ${message}`);
+    return;
+  }
+
+  notification.textContent = message;
+  notification.className = `notification ${type}`;
+  notification.offsetHeight;
+
+  setTimeout(function () {
+    notification.style.opacity = "0";
+    setTimeout(function () {
+      notification.classList.remove("success", "error", "warning");
+      notification.style.opacity = "1";
+    }, 300);
+  }, 5000);
+}

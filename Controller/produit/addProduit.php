@@ -3,6 +3,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 0); // Désactive l'affichage d'erreurs HTML
 require_once '../admin_auth.php';
 require_once '../../inc/Database.php';
+require_once '../../inc/history.php';
 header('Content-Type: application/json');
 
 try {
@@ -52,7 +53,7 @@ try {
 
         // Insérer en base
         $stmt = $pdo->prepare("INSERT INTO produit (designation, caracteristique, quantite, quantite_min, prixUnitaire, categorie, image) 
-                               VALUES (?, ?, ?, ?, ?, ?, ?)");
+                            VALUES (?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([$designation, $caracteristique, $quantite, $quantite_min, $prixUnitaire, $categorie, $image]);
 
         $product_id = $pdo->lastInsertId();
@@ -63,6 +64,8 @@ try {
             $pdo->prepare("DELETE FROM produit WHERE idproduit = ?")->execute([$product_id]);
             throw new Exception('Erreur lors du téléchargement de l\'image');
         }
+
+        log_history($pdo, "Ajout du produit {$designation} ({$caracteristique})");
 
         // Succès
         echo json_encode([

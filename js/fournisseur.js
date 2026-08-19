@@ -1,27 +1,9 @@
 // Variables globales
-let editingUserId = null;
+const btnUpdate = document.getElementById('updateFournisseur');
+const btnAdd = document.getElementById('saveFournisseur');
+let editingFournisseurId = null;
 const BASE_URL = window.location.origin + '/GESTION_SAV/';
 
-// Fonction pour afficher les notifications
-function showNotification(message, type = 'success') {
-    const notification = document.getElementById('notification');
-    if (!notification) {
-        console.error('Notification element not found');
-        alert(`${type}: ${message}`);
-        return;
-    }
-    notification.textContent = message;
-    notification.className = `notification ${type}`;
-    notification.style.display = 'block';
-    
-    setTimeout(() => {
-        notification.style.opacity = '0';
-        setTimeout(() => {
-            notification.style.display = 'none';
-            notification.style.opacity = '1';
-        }, 300);
-    }, 3000);
-}
 // Fonction pour construire l'URL correcte
 function getApiUrl(endpoint) {
     return `${window.location.origin}/GESTION_SAV/Controller/fournisseur/${endpoint}`;
@@ -128,7 +110,7 @@ function saveFournisseur() {
             loadFournisseurs();
             
         } else {
-            showNotification(data.message || 'Erreur', 'error');
+            showNotification(data.message || 'error');
         }
     })
     .catch(error => {
@@ -140,6 +122,10 @@ function saveFournisseur() {
 document.getElementById('saveFournisseur').addEventListener('click', function () {
     saveFournisseur(); 
     close();  
+});
+document.getElementById('updateFournisseur').addEventListener('click', function () {
+    updateFournisseur(); 
+    console.log('Fournisseur mis à jour'); 
 });
 //ouvrir le modal d'ajout fournisseur
 const modalFournisseur = document.getElementById('fournisseurModal');
@@ -211,15 +197,17 @@ function editFournisseur(fournisseurId) {
             if (data.success) {
                 const fournisseur = data.data[0];
                 const produit = data.data[0];
-                document.getElementById('idfour').value = fournisseur.idfour || '';
+                editingFournisseurId = fournisseur.idfour;
                 document.getElementById('nom').value = fournisseur.nom || '';
                 document.getElementById('prenom').value = fournisseur.prenom || '';
                 document.getElementById('telephone').value = fournisseur.telephone || '';
                 document.getElementById('adresse').value = fournisseur.adresse || '';
-                // le champ designation ne remplie pas pareil pour produitLivre se qui est embetant
+                // le champ designation et produitLivre ne sent pas rempli automatiquement, il faut corriger ça
                 document.getElementById('designation').value = produit.designation || '';
                 document.getElementById('produitLivre').value = produit.caracteristique || '';
                 document.getElementById('modalTitle').textContent = " Modifier le fournisseur";
+                btnUpdate.style.display = 'flex';
+                btnAdd.style.display = 'none';
                 modalFournisseur.style.display = 'flex';
             } else {
                 showNotification(data.message || 'Erreur lors du chargement du fournisseur', 'error');
@@ -229,6 +217,48 @@ function editFournisseur(fournisseurId) {
             console.error('Erreur:', error);
             showNotification('Erreur réseau ou serveur', 'error');
       }); 
+}
+// Fonction pour mettre à jour un fournisseur
+function updateFournisseur() {
+
+    if (!editingFournisseurId) {
+        showNotification('ID fournisseur manquant', 'error');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('idfour', editingFournisseurId);
+    formData.append('nom', document.getElementById('nom').value);
+    formData.append('prenom', document.getElementById('prenom').value);
+    formData.append('telephone', document.getElementById('telephone').value);
+    formData.append('adresse', document.getElementById('adresse').value);
+    formData.append('designation', document.getElementById('designation').value);
+    formData.append('produitLivre', document.getElementById('produitLivre').value);
+
+    const url = getApiUrl('update_fournisseur.php');
+    
+    fetch( url, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            showNotification(data.message || 'Fournisseur modifié avec succès');
+            resetForm();
+            loadUsers();
+            fermer();
+        } else {
+            showNotification(data.message || 'Erreur lors de la modification', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Erreur updateFournisseur:', error);
+        showNotification('Erreur serveur: ' + error.message, 'error');
+    });
 }
 // Fonction pour réinitialiser le formulaire
 function resetForm() {

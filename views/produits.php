@@ -1,18 +1,9 @@
 <?php
 require_once 'inc/DataBase.php';
 ?>
- <style>
-   .detail-price{
-   position: absolute;
-   top:1rem;
-   left:1rem;
-   padding: 0.8rem;
-   border-radius: .5rem;
-   background-color: var(--light);
-   font-size: 1.4rem;
-   color:var(--primary);
-    }
-    </style>
+<style>
+
+</style>
 <div class="notification" id="notification"></div>
 
 <div class="container-product">
@@ -24,7 +15,7 @@ require_once 'inc/DataBase.php';
             </button>
         </header>
         <div class="search-container" style="padding-right: 40px;">
-            <input type="text" class="search-box" placeholder="Rechercher un produit...">
+            <input type="text" name="search" class="search-box" placeholder="Rechercher un produit...">
             <button class="btn btn-primary" id="addProductBtn">
                 <span class="material-icons-sharp">add_shopping_cart</span> Ajouter un produit
             </button>
@@ -33,7 +24,7 @@ require_once 'inc/DataBase.php';
 
     <!-- modal pour ajouter des produits-->
     <div class="admin-panel" id="adminPanel">
-        <h2 id="Title">Ajouter un nouveau produit</h2>
+        <h2 id="modalTitle"><span class="material-icons-sharp">add_shopping_cart</span>Ajouter un nouveau produit</h2>
         <div class="form-grid">
             <input type="hidden" id="idproduit" name="idproduit">
             <div class="form-group">
@@ -66,7 +57,7 @@ require_once 'inc/DataBase.php';
 
             <!-- Section d'upload d'image -->
             <div class="form-group image-upload-container">
-                <label>Image du produit</label>
+                <label for="imageUpload">Image du produit</label>
                 <button type="button" class="upload-btn" id="uploadTrigger">
                     <i class="fas fa-cloud-upload-alt"></i>
                     Choisir une image

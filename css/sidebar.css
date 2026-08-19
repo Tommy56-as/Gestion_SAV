@@ -1,0 +1,288 @@
+
+
+/* ---------- Conteneur principal ---------- */
+.main-sidebar {
+    background: var(--white);
+    box-shadow: var(--box-sidebar);
+    padding: 20px 0 20px 16px;
+    height: auto;
+    width: 100%;
+}
+
+/* ---------- En-tête / Profil ---------- */
+.main-sidebar .aside-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px 0 0;
+}
+
+.aside-header .brand {
+    padding-left: 2rem;
+    margin-top: 0;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.profile-img {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--white);
+    box-shadow: 0 4px 12px var(--desaturate-fuscha);
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.greeting {
+    font-size: 0.98rem;
+    color: var(--text-color-secondary);
+    margin: 0;
+}
+
+.user-name {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text-color-primary);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-role {
+    font-size: 0.98rem;
+    color: var(--fuscha);
+    font-weight: 700;
+    text-transform: capitalize;
+    margin: 0;
+}
+
+/* ---------- Toggle thème ---------- */
+.toggle-theme {
+    display: flex;
+    align-items: center;
+    background: var(--desaturate-cyan);
+    border-radius: 12px;
+    padding: 3px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.toggle-theme span {
+    padding: 6px 8px;
+    border-radius: 9px;
+    font-size: 20px;
+    transition: all 0.3s ease;
+}
+
+.toggle-theme span.active {
+    background: linear-gradient(135deg, var(--fuscha), var(--cyan));
+    color: var(--white);
+}
+
+/* ---------- Navigation ---------- */
+.main-sidebar .sidebar {
+    padding-top: 1.5rem;
+    height: auto;
+}
+
+.sidebar .list-items {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.list-items li:last-child {
+    position: static;
+    margin-top: 1.2rem;
+    border-top: 1px solid var(--desaturate-cyan-2);
+    padding-top: 1rem;
+}
+
+.list-items .item a {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 13px 4rem 13px 28px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-radius: 14px;
+    color: var(--text-color-secondary);
+    transition: all 0.3s ease-in-out;
+    position: relative;
+}
+
+.list-items .item a .material-icons-sharp {
+    font-size: 24px;
+    transition: transform 0.3s ease;
+}
+
+.list-items .item a:hover {
+    color: var(--fuscha);
+    background: var(--desaturate-fuscha-2);
+    transform: translateX(4px);
+}
+
+.list-items .item a:hover .material-icons-sharp {
+    transform: scale(1.1);
+}
+
+.list-items .item a.active {
+    color: var(--white);
+    background: linear-gradient(135deg, var(--fuscha), var(--cyan));
+    box-shadow: 0 8px 20px var(--desaturate-fuscha);
+}
+
+.list-items .item a.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 5px;
+    height: 60%;
+    border-radius: 0 4px 4px 0;
+    background: var(--white);
+    opacity: 0.9;
+}
+
+.list-items .item a.active .material-icons-sharp {
+    color: var(--white);
+}
+
+/* Lien logout */
+.list-items .item:last-child a {
+    color: var(--danger);
+}
+
+.list-items .item:last-child a:hover {
+    background: var(--desaturate-fuscha);
+    color: var(--danger);
+}
+
+.list-items .item:last-child a.active {
+    background: linear-gradient(135deg, var(--danger), var(--fuscha));
+    color: var(--white);
+}
+
+/* ---------- Scrollbar ---------- */
+.main-sidebar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.main-sidebar::-webkit-scrollbar-thumb {
+    background: var(--desaturate-cyan);
+    border-radius: 10px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1200px) {
+    .main-sidebar {
+        width: 110px;
+        padding-left: 8px;
+    }
+
+    /* Le toggle thème passe sous la photo du profil */
+    .main-sidebar .aside-header {
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 12px;
+        padding: 0;
+    }
+
+    .aside-header .brand {
+        padding-left: 0;
+        width: 100%;
+    }
+
+    .user-profile {
+        justify-content: center;
+        padding: 8px;
+    }
+
+    .user-info,
+    .greeting,
+    .user-role {
+        display: none;
+    }
+
+    .toggle-theme {
+        align-self: center;
+    }
+
+    .list-items .item a {
+        justify-content: center;
+        padding: 14px;
+        gap: 0;
+    }
+
+    .list-items .item a span:not(.material-icons-sharp) {
+        display: none;
+    }
+
+    .list-items .item a.active::before {
+        left: -8px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-sidebar {
+        width: 300px;
+        border-radius: 0 24px 24px 0;
+        margin: 0;
+        padding-left: 4px;
+    }
+
+    .main-sidebar .aside-header {
+        padding: 0;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 12px;
+    }
+
+    .aside-header .brand {
+        padding-left: 0;
+        width: 100%;
+    }
+
+    .user-profile {
+        justify-content: flex-start;
+        padding: 12px 16px;
+        width: auto;
+    }
+
+    .user-info,
+    .greeting,
+    .user-role {
+        display: flex;
+    }
+
+    .toggle-theme {
+        align-self: flex-start;
+        margin-left: 16px;
+    }
+
+    .list-items .item a {
+        justify-content: flex-start;
+        padding: 14px 3rem;
+        gap: 14px;
+    }
+
+    .list-items .item a span:not(.material-icons-sharp) {
+        display: inline;
+    }
+}

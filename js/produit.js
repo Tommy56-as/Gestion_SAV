@@ -73,7 +73,7 @@ function renderProduit(produit) {
                         <div class="plan-actions">
                             <button class="action-btn edit-btn"
                                 onclick="editProduit(${produit.idproduit})">
-                                Modifier
+                                Modifier le produit
                             </button>
                         </div>
                     </div>
@@ -111,7 +111,7 @@ function updateProduit() {
             loadProduits();
             resetForm();
             // Revenir au mode ajout
-            document.getElementById('Title').textContent = 'Ajouter un nouveau produit';
+            document.getElementById('modalTitle').textContent = 'Ajouter un nouveau produit';
             document.getElementById('addProduit').style.display = 'block';
             document.getElementById('updateProduit').style.display = 'none';
         } else {
@@ -160,8 +160,7 @@ function addProduit() {
         });
 }
 /*
- FRA1DL20257042172 France métropolitaine - Long séjour (> 90 jours)
-TSAGUE KOUGANG Raoul Loic 27/10/2002 
+
 */
 
 // Fonction pour éditer un plan
@@ -203,7 +202,7 @@ function editProduit(idproduit) {
 
             // Changer le mode édition
             editingidProduit = produit.idproduit;
-            document.getElementById('Title').textContent = 'Modification du produit';
+            document.getElementById('modalTitle').textContent = 'Modification du produit';
             document.getElementById('addProduit').style.display = 'none';
             document.getElementById('updateProduit').style.display = 'block';
             document.getElementById('adminPanel').style.display = 'block';
@@ -227,18 +226,6 @@ function showImagePreview(file) {
     reader.readAsDataURL(file);
     // Définit selectedImage si tu l'utilises ailleurs (par exemple pour l'upload)
     window.selectedImage = file; // Utilise window pour la rendre globale
-}
-// Fonction pour afficher les notifications
-function showNotification(message, type = 'info') {
-    const notification = document.getElementById('notification');
-    notification.textContent = message;
-    notification.className = `notification ${type}`;
-    notification.style.display = 'block';
-
-    // Cache après 3 secondes
-    setTimeout(() => {
-        notification.style.display = 'none';
-    }, 3000);
 }
 
 // Initialisation
@@ -281,7 +268,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // Gestionnaire pour le mode admin
     document.getElementById("addProductBtn").addEventListener("click", function() {
-        document.getElementById('Title').textContent = 'Ajouter un nouveau produit';
+        document.getElementById('modalTitle').textContent = 'Ajouter un nouveau produit';
         const adminPanel = document.getElementById("adminPanel");
         adminPanel.style.display =
             adminPanel.style.display === "block" ? "none" : "block";

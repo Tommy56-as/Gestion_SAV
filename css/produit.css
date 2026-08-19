@@ -1,63 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
 
-:root {
-    --white: #fff;
-    --success: hsl(184, 46%, 57%);
-    --primary: #4361ee;
-    --secondary: #3f37c9;
-    --light: #f8f9fa;
-    --dark: #212529;
-    --success: #4bb543;
-    --warning: #ffcc00;
-    --danger: #dc3545;
-    --gray: #6c757d;
-    --border-radius: 16px;
-    --shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    --transition: all 0.3s ease;
-    --fuscha: hsl(334, 94%, 57%);
-    --desaturate-fuscha: hsla(334, 94%, 57%, 0.15);
-    --desaturate-fuscha-2: hsla(334, 94%, 57%, 0.1);
-
-    --cyan: hsl(184, 46%, 57%);
-    --desaturate-cyan: hsla(184, 46%, 57%, 0.25);
-    --desaturate-cyan-2: hsla(184, 46%, 57%, 0.15);
-
-    --light-blue: #bbeef1;
-    --pinkless: #fff3f0;
-    --yellow: #f1b813;
-
-    --text-color-primary: #314657;
-    --text-color-secondary: #58626e;
-    --text-color-third: #9db3be;
-
-    --box-shadow-card: 8px 8px 32px var(--desaturate-fuscha);
-    --box-shadow-card-2: 8px 8px 32px var(--desaturate-cyan);
-    --box-sidebar: 2px 4px 16px var(--desaturate-cyan-2);
-
-    --padding-card: 28px;
-
-    --border-radius-rounded: 50%;
-    --border-radius-4: 4px;
-    --border-radius-8: 8px;
-    --border-radius-12: 12px;
-    --border-radius-card: var(--padding-card);
-}
-
-.dark-mode {
-    --white: #393e46;
-    --light: #222831;
-    --dark: #eeeeee;
-    --primary: #4361ee;
-    --desaturate-fuscha: hsla(334, 8%, 67%, 0.15);
-
-    --text-color-primary: #eee;
-    --text-color-secondary: #eee;
-
-    --box-shadow-card: 8px 8px 32px var(--desaturate-fuscha);
-    --box-shadow-card-2: 8px 8px 32px var(--desaturate-cyan);
-
-}
-/* Contenu du plan */
+/* Contenu du produit */
 .container-product {
     max-width: 1500px;
     margin: 0 auto;
@@ -104,7 +46,7 @@
 }
 
 .edit-btn {
-    background: var(--warning);
+    background: var(--fuscha);
     color: var(--dark);
     width: 100px;
 }
@@ -115,13 +57,14 @@
 }
 /* Styles pour le formulaire d'ajout/édition de plan */
 .admin-panel {
-    width: 100%;
+    width: 1500px;
     background: var(--light);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-12);
     padding: 30px;
+    margin-bottom: 15px;
     box-shadow: var(--shadow);
     display: none;
-   
+
 }
 
 .admin-panel h2 {
@@ -164,7 +107,7 @@
 .image-preview {
     width: 100%;
     height: 150px;
-    border: 1px dashed #ddd;
+    border: 1px dashed var(--primary);
     border-radius: 8px;
     margin-top: 10px;
     display: flex;
@@ -183,7 +126,7 @@
 }
 
 .image-preview .placeholder {
-    color: var(--gray);
+    color: var(--white);
     text-align: center;
     padding: 10px;
     background: var(--cyan);
@@ -233,18 +176,18 @@
 
 .update-btn {
     background: var(--primary);
-    color:var(--light);
+    color:var(--dark);
 }
 
 .reset-btn {
-    background: var(--gray);
-    color:var(--light);
+    background: var(--cyan);
+    color:var(--dark);
 }
 
 /**carte pour les produits**/
 .produits-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 25px;
     margin-bottom: 40px;
 }
@@ -298,7 +241,7 @@
 }
 .produit-image {
     height: 180px;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    background:  var(--white);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -325,4 +268,14 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.1);
+}
+   .detail-price {
+   position: absolute;
+   top:1rem;
+   left:1rem;
+   padding: 0.8rem;
+   border-radius: .5rem;
+   background-color: var(--light);
+   font-size: 1.4rem;
+   color:var(--primary);
 }

@@ -439,6 +439,23 @@ INSERT INTO `vente` (`idvente`, `client`, `produit`, `caracteristique`, `numero_
 (9, 'Paul', 'laptop corei7', '500Go/2g0ram/2goDD/2ghz', '2546897ASRS', 150000, '1', '2025-07-27', '2025-08-22'),
 (10, 'Paul', 'Laptop hp Corei5 6gen', 'Hdd500go/Ram8go/dd2go/cpu2GHz', '2546897ASRS', 150000, '5', '2025-07-27', '2025-08-31');
 
+CREATE TABLE IF NOT EXISTS `details_vente` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `idvente` INT(11) NOT NULL,
+  `idproduit` INT(11),
+  `designation` VARCHAR(255) NOT NULL,
+  `caracteristique` VARCHAR(255),
+  `quantite` INT NOT NULL,
+  `prixUnitaire` DOUBLE,
+  `montant` DOUBLE,
+  `finGarantie` DATE,
+  `Created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`idvente`) REFERENCES `vente`(`idvente`) ON DELETE CASCADE,
+  FOREIGN KEY (`idproduit`) REFERENCES `produit`(`idproduit`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 3. Ajouter un index sur idvente pour les performances
+CREATE INDEX idx_details_vente_idvente ON `details_vente`(`idvente`);
 --
 -- Index pour les tables déchargées
 --

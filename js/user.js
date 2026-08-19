@@ -2,26 +2,7 @@
 let editingUserId = null;
 const BASE_URL = window.location.origin + '/GESTION_SAV/';
 
-// Fonction pour afficher les notifications
-function showNotification(message, type = 'success') {
-    const notification = document.getElementById('notification');
-    if (!notification) {
-        console.error('Notification element not found');
-        alert(`${type}: ${message}`);
-        return;
-    }
-    notification.textContent = message;
-    notification.className = `notification ${type}`;
-    notification.style.display = 'block';
-    
-    setTimeout(() => {
-        notification.style.opacity = '0';
-        setTimeout(() => {
-            notification.style.display = 'none';
-            notification.style.opacity = '1';
-        }, 300);
-    }, 3000);
-}
+
 
 // Fonction pour construire l'URL correcte
 function getApiUrl(endpoint) {
@@ -287,7 +268,7 @@ function changeUserStatus(userId, status) {
     .then(data => {
         if (data.success) {
             const action = status == 1 ? 'bloqué' : 'débloqué';
-            showNotification(`Utilisateur ${action} avec succès`);
+            showNotification(`Utilisateur ${action} avec succès`,'success');
             updateUserCardUI(userId, status);
             loadUsers();
         } else {

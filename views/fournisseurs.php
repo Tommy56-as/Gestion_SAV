@@ -72,13 +72,13 @@ require_once 'inc/DataBase.php';
                     <select id="designation" class="form-control" required>
                         <option value="">Sélectionner un produit</option>
                         <?php
-                        $stmt = $pdo->query("SELECT DISTINCT designation FROM produit");
+                            $stmt = $pdo->query("SELECT DISTINCT designation FROM produit");
                             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                 echo '<option value="' . htmlspecialchars($row['designation']) . '">'
                                 . htmlspecialchars($row['designation'])
-                               . '</option>';
-                         }
-                       ?>
+                                . '</option>';
+                                }
+                        ?>
                     </select>
                 </div>
                 <div class="form-group full-width">
@@ -96,7 +96,7 @@ require_once 'inc/DataBase.php';
                 <button type="button" class="btn btn-primary" id="saveFournisseur" style="flex: 1;">
                     <span class="material-icons-sharp">save</span> Enregistrer
                 </button>
-                <button type="button" class="btn btn-primary" id="updateUser" style="flex: 1; display:none;">
+                <button type="button" class="btn btn-primary" id="updateFournisseur" style="flex: 1; display:none;">
                     <span class="material-icons-sharp">save</span> Modifier
                 </button>
             </div>
