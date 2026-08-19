@@ -1,6 +1,7 @@
 <?php
 require_once '../admin_auth.php';
 require_once '../../inc/Database.php';
+require_once '../../inc/history.php';
 header('Content-Type: application/json');
 
 if($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -48,8 +49,9 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
         $stmt = $pdo->prepare("INSERT INTO utilisateur (Nom_Utilisateur, Email, TypeDeCompte, MotDePasse, NomComplet, Telephone, Adresse, Statut) 
-                               VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([$username, $email, $account_type, $hashed_password, $full_name, $phone, $address, $status]);
+        log_history($pdo, "Ajout de l'utilisateur {$username} ({$email})");
         
         echo json_encode([
             'success' => true, 

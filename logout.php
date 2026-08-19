@@ -1,9 +1,12 @@
 <?php
 session_start();
+require_once __DIR__ . '/inc/Database.php';
+require_once __DIR__ . '/inc/history.php';
 
 // Journaliser la déconnexion
 if (isset($_SESSION['user_id'])) {
-    error_log("Déconnexion utilisateur - ID: " . $_SESSION['user_id']);
+    $userName = $_SESSION['user_nom'] ?? 'Utilisateur';
+    log_history($pdo, 'Déconnexion de l’utilisateur ' . $userName, $userName);
 }
 
 // Détruire complètement la session

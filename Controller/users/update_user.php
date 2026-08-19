@@ -1,6 +1,7 @@
 <?php
 require_once '../admin_auth.php';
 require_once '../../inc/Database.php';
+require_once '../../inc/history.php';
 header('Content-Type: application/json');
 
 // Vérification des champs obligatoires
@@ -17,6 +18,10 @@ foreach ($required_fields as $field) {
 }
 
 $id = (int) $_POST['idUser'];
+
+$targetStatement = $pdo->prepare('SELECT Nom_Utilisateur FROM utilisateur WHERE idUser = ?');
+$targetStatement->execute([$id]);
+$targetUser = $targetStatement->fetchColumn() ?: 'Utilisateur #' . $id;
 
 $sql = "
 UPDATE utilisateur SET
@@ -47,6 +52,7 @@ $params[':idUser'] = $id;
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
+log_history($pdo, "Modification de l'utilisateur {$targetUser}");
 
 echo json_encode([
     'success' => true,

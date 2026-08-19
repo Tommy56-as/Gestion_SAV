@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once __DIR__ . '/../inc/Database.php';
+require_once __DIR__ . '/../inc/history.php';
 
 // Vérifier si un admin est connecté
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_type'])|| !isset($_SESSION['user_email'])) {
@@ -14,6 +16,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_type'])|| !isset($_SE
 
 // Vérifier le timeout de session (30 minutes)
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > 1800) {
+    log_history($pdo, 'Déconnexion automatique après expiration de session', $_SESSION['user_nom'] ?? 'Utilisateur');
     session_unset();
     session_destroy();
     $_SESSION['login_errors'] = ["Session expirée. Veuillez vous reconnecter."];
