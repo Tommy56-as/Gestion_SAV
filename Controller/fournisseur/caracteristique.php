@@ -20,9 +20,10 @@ try {
 
     echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
 } catch (PDOException $e) {
+    error_log('Erreur caractéristiques fournisseur: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode([
         'error' => true,
-        'message' => $e->getMessage()
+        'message' => 'Impossible de charger les caractéristiques'
     ]);
 }

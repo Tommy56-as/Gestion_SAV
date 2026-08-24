@@ -56,9 +56,9 @@ try {
     $repa_statut = $pdo->query("SELECT statut, COUNT(*) AS nb FROM reparation GROUP BY statut")->fetchAll(PDO::FETCH_ASSOC);
     $map_statut = [];
     foreach ($repa_statut as $rs) { $map_statut[$rs['statut']] = (int)$rs['nb']; }
-    $nb_repa_attente  = $map_statut['en attente'] ?? 0;
-    $nb_repa_cours    = $map_statut['en cours'] ?? 0;
-    $nb_repa_terminee = $map_statut['terminée'] ?? 0;
+    $nb_repa_attente  = $map_statut['en_attente'] ?? 0;
+    $nb_repa_cours    = $map_statut['en_cours'] ?? 0;
+    $nb_repa_terminee = $map_statut['terminee'] ?? 0;
 
     /* ===== VENTES DES 7 DERNIERS JOURS (comparaison hebdomadaire) ===== */
     $ventes_7j = [];

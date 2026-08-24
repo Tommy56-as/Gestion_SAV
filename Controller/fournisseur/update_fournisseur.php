@@ -1,7 +1,10 @@
-<?
+<?php
 
 header('Content-Type: application/json');
 require_once '../admin_auth.php';
+require_once '../../inc/authorization.php';
+require_admin();
+require_csrf();
 require_once '../../inc/Database.php';
 require_once '../../inc/history.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['idfour'])) {

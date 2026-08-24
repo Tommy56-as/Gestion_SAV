@@ -10,5 +10,7 @@ try {
     
     echo json_encode(['success' => true, 'data' => $produits]);
 } catch(PDOException $e) {
-    echo json_encode(['success' => false, 'message' => 'Erreur: ' . $e->getMessage()]);
-}   
+    error_log('Erreur produits: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Erreur lors du chargement des produits']);
+}

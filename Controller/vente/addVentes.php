@@ -2,6 +2,8 @@
 require_once '../admin_auth.php';
 require_once '../../inc/DataBase.php';
 require_once '../../inc/history.php';
+require_permission('vente.create');
+require_csrf();
 header('Content-Type: application/json');
 
 // ajout d'une vente
@@ -46,8 +48,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         // Insérer la vente (entête)
-        $stmt = $pdo->prepare("INSERT INTO vente (client, telephone, date_vente, totalHT) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$client, $telephone, $date_vente, $totalHT]);
+        $stmt = $pdo->prepare("INSERT INTO vente (created_by, client, telephone, date_vente, totalHT) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([current_user_id(), $client, $telephone, $date_vente, $totalHT]);
         $idvente = $pdo->lastInsertId();
 
         // Insérer les détails des produits dans details_vente
@@ -105,7 +107,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
     } catch(PDOException $e) {
         http_response_code(500);
-        echo json_encode(['success' => false, 'message' => 'Erreur: ' . $e->getMessage()]);
+        error_log('Erreur ajout vente: ' . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Erreur lors de l’enregistrement de la vente']);
     }
 } else {
     http_response_code(400);

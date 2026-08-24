@@ -31,12 +31,14 @@ function is_active($page) {
     return $current_page === $page ? ' class="active"' : '';
 }
 
+$isAdmin = ($_SESSION['user_type'] ?? '') === 'Administrateur';
+
 ?>
 <div class="main-sidebar">
     <div class="aside-header">
         <div class="brand">
             <div class="user-profile">
-                <img src="img/ceci.jpg" alt="Profil utilisateur" class="profile-img">
+                <img src="img/OIP.webp" alt="Profil utilisateur" class="profile-img">
                 <div class="user-info">
                     <p class="greeting">Bienvenue,</p>
                     <h2 class="user-name"><?php echo htmlspecialchars($nomUser); ?></h2>
@@ -73,12 +75,14 @@ function is_active($page) {
                     <span>Ventes</span>
                 </a>
             </li>
+            <?php if ($isAdmin): ?>
             <li class="item">
                 <a href="home.php?page=fournisseurs" <?= is_active('fournisseurs') ?>>
                     <span class="material-icons-sharp">groups</span>
                     <span>Fournisseurs</span>
                 </a>
             </li>
+            <?php endif; ?>
             <li class="item">
                 <a href="home.php?page=commandes" <?= is_active('commandes') ?>>
                     <span class="material-icons-sharp">local_offer</span>
@@ -86,23 +90,55 @@ function is_active($page) {
                 </a>
             </li>
             <li class="item">
+                <a href="home.php?page=reparations" <?= is_active('reparations') ?>>
+                    <span class="material-icons-sharp">build</span>
+                    <span>Réparations</span>
+                </a>
+            </li>
+            <?php if ($isAdmin): ?>
+            <li class="item">
                 <a href="home.php?page=utilisateurs" <?= is_active('utilisateurs') ?>>
                     <span class="material-icons-sharp">person_add_alt</span>
                     <span>Utilisateurs</span>
                 </a>
             </li>
+            <?php endif; ?>
+            <?php if ($isAdmin): ?>
             <li class="item">
                 <a href="home.php?page=historiques" <?= is_active('historiques') ?>>
                     <span class="material-icons-sharp">history</span>
                     <span>Historiques</span>
                 </a>
             </li>
+            <?php endif; ?>
+            <?php if ($isAdmin): ?>
             <li class="item">
-                <a href="home.php?page=graphe" <?= is_active('graphe') ?>>
+                <a href="home.php?page=Statistiques" <?= is_active('Statistiques') ?>>
                     <span class="material-icons-sharp">bar_chart</span>
                     <span>Statistiques</span>
                 </a>
             </li>
+            <?php endif; ?>
+            <li class="item">
+                <a href="home.php?page=parametres" <?= is_active('parametres') ?>>
+                    <span class="material-icons-sharp">settings</span>
+                    <span>Paramètres</span>
+                </a>
+            </li>
+            <?php if (($_SESSION['user_type'] ?? '') === 'Administrateur'): ?>
+            <li class="item">
+                <a href="home.php?page=autorisations" <?= is_active('autorisations') ?>>
+                    <span class="material-icons-sharp">admin_panel_settings</span>
+                    <span>Autorisations</span>
+                </a>
+            </li>
+            <li class="item">
+                <a href="home.php?page=sessions" <?= is_active('sessions') ?>>
+                    <span class="material-icons-sharp">monitor_heart</span>
+                    <span>Sessions</span>
+                </a>
+            </li>
+            <?php endif; ?>
             <li class="item">
                 <a href="logout.php">
                     <span class="material-icons-sharp">logout</span>

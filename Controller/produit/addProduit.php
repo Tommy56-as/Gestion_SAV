@@ -2,6 +2,8 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 0); // Désactive l'affichage d'erreurs HTML
 require_once '../admin_auth.php';
+require_permission('produit.create');
+require_csrf();
 require_once '../../inc/Database.php';
 require_once '../../inc/history.php';
 header('Content-Type: application/json');
@@ -29,20 +31,24 @@ try {
         $categorie = trim($_POST['categorie']);
 
         // Gestion de l'image
-        $image = $_FILES['image']['name'];
-        $image = filter_var($image, FILTER_SANITIZE_STRING);
-        $image_size = $_FILES['image']['size'];
         $image_tmp_name = $_FILES['image']['tmp_name'];
-        $image_folder = '../../img/' . $image;
+        $image_size = $_FILES['image']['size'];
+        $image_folder = realpath(__DIR__ . '/../../img');
+        if ($image_folder === false) {
+            throw new Exception('Dossier image indisponible');
+        }
 
         // Vérifications sur l'image
-        $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
-        if (!in_array($_FILES['image']['type'], $allowed_types)) {
+        $mime = (new finfo(FILEINFO_MIME_TYPE))->file($image_tmp_name);
+        $allowed_types = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif'];
+        if (!isset($allowed_types[$mime]) || @getimagesize($image_tmp_name) === false) {
             throw new Exception('Type d\'image non autorisé (JPEG, PNG, GIF seulement)');
         }
         if ($image_size > 3 * 1024 * 1024) {
             throw new Exception('Image trop grande (max 3 Mo)');
         }
+        $image = bin2hex(random_bytes(16)) . '.' . $allowed_types[$mime];
+        $image_path = $image_folder . DIRECTORY_SEPARATOR . $image;
 
         // Vérifier si le produit existe déjà
         $check_stmt = $pdo->prepare("SELECT * FROM produit WHERE designation = ? AND caracteristique = ?");
@@ -59,7 +65,7 @@ try {
         $product_id = $pdo->lastInsertId();
 
         // Déplacer le fichier
-        if (!move_uploaded_file($image_tmp_name, $image_folder)) {
+        if (!move_uploaded_file($image_tmp_name, $image_path)) {
             // Si échec, supprimer l'entrée en base
             $pdo->prepare("DELETE FROM produit WHERE idproduit = ?")->execute([$product_id]);
             throw new Exception('Erreur lors du téléchargement de l\'image');
@@ -78,6 +84,15 @@ try {
     }
 } catch (Exception $e) {
     http_response_code(400); // Ou 500 selon l'erreur
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    $safeMessages = [
+        'Une image est requise et doit être valide',
+        'Type d\'image non autorisé (JPEG, PNG, GIF seulement)',
+        'Image trop grande (max 3 Mo)',
+        'Ce produit existe déjà',
+        'Dossier image indisponible',
+        'Erreur lors du téléchargement de l\'image'
+    ];
+    error_log('Erreur ajout produit: ' . $e->getMessage());
+    echo json_encode(['success' => false, 'message' => in_array($e->getMessage(), $safeMessages, true) ? $e->getMessage() : 'Erreur lors de la création du produit']);
 }
 ?>

@@ -2,6 +2,8 @@
     
 header('Content-Type: application/json');
 require_once '../admin_auth.php';
+require_once '../../inc/authorization.php';
+require_admin();
 require_once '../../inc/Database.php';
 // affihage de tous les fournisseurs
 try {
@@ -17,11 +19,14 @@ try {
         WHERE p.idproduit = f.produit_livre
     ) AS produit_livres,
     statut
-FROM fournisseur f;
+FROM fournisseur f
+WHERE f.supprime = 0;
 ");
     $fournisseurs = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     echo json_encode(['success' => true, 'fournisseurs' => $fournisseurs]);
 } catch(PDOException $e) {
-    echo json_encode(['success' => false, 'message' => 'Erreur: ' . $e->getMessage()]);
+    error_log('Erreur fournisseurs: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Erreur lors du chargement des fournisseurs']);
 }

@@ -1,5 +1,8 @@
 <?php
 require_once '../admin_auth.php';
+require_once '../../inc/authorization.php';
+require_admin();
+require_csrf();
 require_once '../../inc/Database.php';
 require_once '../../inc/history.php';
 
@@ -24,7 +27,7 @@ $produitLivre = ($_POST['produitLivre'] ?? 0);
 $statut = $_POST['statut'] ?? 0; // actif par défaut
 
 // verifier si le fournisseur existe deja en fonction du nom, prenom et produit livre
-$check_stmt = $pdo->prepare("SELECT * FROM fournisseur WHERE nom = ? AND prenom = ? AND produit_livre = ?");
+$check_stmt = $pdo->prepare("SELECT * FROM fournisseur WHERE nom = ? AND prenom = ? AND produit_livre = ? AND supprime = 0");
 $check_stmt->execute([$nom, $prenom, $produitLivre]);
 if ($check_stmt->fetch()) {
     http_response_code(409);

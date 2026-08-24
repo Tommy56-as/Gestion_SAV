@@ -18,8 +18,9 @@ if(isset($_GET['idproduit'])) {
             echo json_encode(['success' => false, 'message' => 'Produit non trouvé']);
         }
     } catch(PDOException $e) {
+        error_log('Erreur produit: ' . $e->getMessage());
         http_response_code(500);
-        echo json_encode(['success' => false, 'message' => 'Erreur: ' . $e->getMessage()]);
+        echo json_encode(['success' => false, 'message' => 'Erreur lors du chargement du produit']);
     }
 } else {
     http_response_code(400);

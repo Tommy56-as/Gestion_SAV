@@ -1,6 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Roboto+Slab:wght@400;500;600;700&display=swap');
 
 :root {
+    --app-font: 'Nunito', sans-serif;
+    --base-font-size: 14px;
     --primary: #4361ee;
     --secondary: #3f37c9;
     --white: #fff;
@@ -10,12 +12,12 @@
     --black: #0f0f0e;
 
     --fuscha: hsl(334, 94%, 57%);
-    --desaturate-fuscha: hsla(334, 94%, 57%, 0.15);
-    --desaturate-fuscha-2: hsla(334, 94%, 57%, 0.1);
+    --desaturate-fuscha: color-mix(in srgb, var(--fuscha) 15%, transparent);
+    --desaturate-fuscha-2: color-mix(in srgb, var(--fuscha) 10%, transparent);
 
     --cyan: hsl(184, 46%, 57%);
-    --desaturate-cyan: hsla(184, 46%, 57%, 0.25);
-    --desaturate-cyan-2: hsla(184, 46%, 57%, 0.15);
+    --desaturate-cyan: color-mix(in srgb, var(--cyan) 25%, transparent);
+    --desaturate-cyan-2: color-mix(in srgb, var(--cyan) 15%, transparent);
 
     --light-blue: #bbeef1;
     --pinkless: #fff3f0;

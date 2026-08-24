@@ -4,7 +4,7 @@
  * Ce fichier traite la connexion et la validation des credentials
  */
 
-session_start();
+require_once(__DIR__ . '/bootstrap.php');
 
 // Inclure le fichier de connexion à la base de données
 require_once(__DIR__ . '/Database.php');
@@ -20,6 +20,7 @@ $user_name = null;
  * Traitement de la requête POST (soumission du formulaire)
  */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_csrf();
     // Récupération et nettoyage des données
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
@@ -34,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         try {
             // Vérifier si l'email existe
-            $stmt = $pdo->prepare("SELECT * FROM `utilisateur` WHERE Email = ?");
+            $stmt = $pdo->prepare("SELECT * FROM `utilisateur` WHERE Email = ? AND supprime = 0");
             $stmt->execute([$email]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -68,6 +69,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $_SESSION['user_statut'] = $user['Statut'];
                         $_SESSION['login_time'] = time();
                         $_SESSION['login_success'] = true;
+                        require_once __DIR__ . '/authorization.php';
+                        register_user_session();
 
                         log_history($pdo, 'Connexion de l’utilisateur ' . ($_SESSION['user_nom'] ?? 'Utilisateur'));
                         

@@ -2,6 +2,8 @@
 require_once '../admin_auth.php';
 require_once '../../inc/Database.php';
 require_once '../../inc/history.php';
+require_admin();
+require_csrf();
 header('Content-Type: application/json');
 // blacage et deblocage d'un utilisateur
 if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['idUser'])) {
@@ -19,7 +21,9 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['idUser'])) {
         
         echo json_encode(['success' => true, 'message' => 'Statut mis à jour avec succès']);
     } catch(PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Erreur: ' . $e->getMessage()]);
+        error_log('Erreur statut utilisateur: ' . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Erreur lors de la mise à jour du statut']);
     }
 } else {
     echo json_encode(['success' => false, 'message' => 'Paramètres manquants']);

@@ -2,13 +2,15 @@
 header('Content-Type: application/json');
 require_once '../admin_auth.php';
 require_once '../../inc/Database.php';
+require_admin();
 // affihage de tous les utilisateurs
 try {
-    $stmt = $pdo->query("SELECT * FROM utilisateur");
+    $stmt = $pdo->query("SELECT * FROM utilisateur WHERE supprime = 0");
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     echo json_encode(['success' => true, 'users' => $users]);
 } catch(PDOException $e) {
-    echo json_encode(['success' => false, 'message' => 'Erreur: ' . $e->getMessage()]);
+    error_log('Erreur utilisateurs: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Erreur lors du chargement des utilisateurs']);
 }
-

@@ -1,6 +1,7 @@
 <?php
 require_once '../admin_auth.php';
 require_once '../../inc/DataBase.php';
+require_permission('vente.read');
 header('Content-Type: application/json');
 
 // Récupérer les ventes
@@ -20,7 +21,9 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
         
         echo json_encode(['success' => true, 'data' => $ventes]);
     } catch(PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Erreur: ' . $e->getMessage()]);
+        error_log('Erreur ventes: ' . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Erreur lors du chargement des ventes']);
     }
 } else {
     echo json_encode(['success' => false, 'message' => 'Méthode non autorisée']);

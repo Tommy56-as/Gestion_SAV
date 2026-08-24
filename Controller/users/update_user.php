@@ -2,6 +2,8 @@
 require_once '../admin_auth.php';
 require_once '../../inc/Database.php';
 require_once '../../inc/history.php';
+require_admin();
+require_csrf();
 header('Content-Type: application/json');
 
 // Vérification des champs obligatoires

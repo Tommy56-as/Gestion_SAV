@@ -40,7 +40,7 @@ require_once 'inc/DataBase.php';
             </h2>
         </div>
         <form id="fournisseurForm" method="POST" action="">
-            <input type="hidden" id="idfour" name="fournisseurId">
+            <input type="hidden" id="idfour" name="idfour" value="">
             <input type="hidden" id="fournisseurStatus" name="statut" value="0">
             <div class="form-grid">
                 <div class="form-group">

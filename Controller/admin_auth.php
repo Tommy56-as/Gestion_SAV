@@ -1,15 +1,16 @@
 <?php
-session_start();
+require_once __DIR__ . '/../inc/bootstrap.php';
 require_once __DIR__ . '/../inc/Database.php';
 require_once __DIR__ . '/../inc/history.php';
+require_once __DIR__ . '/../inc/authorization.php';
 
-// Vérifier si un admin est connecté
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_type'])|| !isset($_SESSION['user_email'])) {
+// Vérifier si un utilisateur est connecté. Les permissions sont vérifiées par action.
+if (!is_authenticated() || !isset($_SESSION['user_email'])) {
     // Journaliser la tentative d'accès non autorisé
     error_log("Tentative d'accès non autorisé à l'espace admin - IP: " . $_SERVER['REMOTE_ADDR']);
     
     // Rediriger vers la page de login avec un message d'erreur
-    $_SESSION['login_errors'] = ["Accès réservé aux administrateurs."];
+    $_SESSION['login_errors'] = ["Veuillez vous connecter pour accéder à cette page."];
     header('Location: index.php');
     exit;
 }
@@ -26,6 +27,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) >
 
 // Mettre à jour le timestamp d'activité
 $_SESSION['last_activity'] = time();
+register_user_session();
 
 // Protection contre le clickjacking
 header('X-Frame-Options: DENY');

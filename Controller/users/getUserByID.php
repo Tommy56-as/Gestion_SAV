@@ -1,6 +1,7 @@
 <?php
 require_once '../admin_auth.php';
 require_once '../../inc/Database.php';
+require_admin();
 
 header('Content-Type: application/json');
 

@@ -1,7 +1,4 @@
 <?php
-/**
- * Page de connexion - Gestion de l'authentification
- */
 
 // Inclure la gestion de l'authentification
 require_once('inc/auth.php');
@@ -13,11 +10,11 @@ require_once('inc/auth.php');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
     <link rel="icon" href="img/miner.jpg" type="image/jpeg" sizes="16*16">
     <link rel="icon" href="img/logo.jpeg" type="image/jpeg" sizes="32*32">
     <link rel="icon" href="img/logo.jpeg" type="image/jpeg" sizes="48*48">
     <link rel="apple-touch-icon" href="img/logo.jpeg" type="image/jpeg" sizes="152*152">
-    <script src="https://cdn.tailwindcss.com"></script>
     <title>G.S.A.V - Connexion</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -27,7 +24,8 @@ require_once('inc/auth.php');
 <body>
     <div class="container">
         <div class="header">
-            <div style="margin-bottom: 20px;display: flex;justify-content: center;align-items: center;">
+            <div
+                style="margin-bottom: 20px;display: flex;justify-content: center;align-items: center;border-radius: 9px;">
                 <img src="img/miner.jpg" alt="Logo Gestion SAV"
                     style="width: 200px; height: 200px; border-radius: 50%;">
             </div>
@@ -99,6 +97,8 @@ require_once('inc/auth.php');
                 <?php endif; ?>
 
                 <form id="loginForm" action="" method="POST">
+                    <input type="hidden" name="csrf_token"
+                        value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
                     <div class="form-group">
                         <label for="login-email"
                             style="display: block; margin-bottom: 8px; font-weight: 500;">Email</label>

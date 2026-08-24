@@ -29,8 +29,8 @@
 }
 
 .profile-img {
-    width: 52px;
-    height: 52px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid var(--white);
@@ -62,7 +62,7 @@
 .user-role {
     font-size: 0.98rem;
     color: var(--fuscha);
-    font-weight: 700;
+    font-weight: 800;
     text-transform: capitalize;
     margin: 0;
 }
@@ -235,6 +235,66 @@
 
     .list-items .item a.active::before {
         left: -8px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-sidebar .aside-header {
+        position: relative;
+        align-items: flex-start;
+        padding: 0 44px 0 0;
+    }
+
+    .aside-header .brand {
+        padding-left: 0;
+        width: 100%;
+    }
+
+    .user-profile {
+        justify-content: flex-start;
+        align-items: center;
+        flex-direction: row;
+        gap: 12px;
+        padding: 8px 0;
+        text-align: left;
+    }
+
+    .profile-img {
+        flex-shrink: 0;
+        width: 70px;
+        height: 70px;
+    }
+
+    .user-info,
+    .greeting,
+    .user-role {
+        display: flex;
+    }
+
+    .user-info {
+        min-width: 0;
+    }
+
+    .greeting {
+        font-size: 0.8rem;
+    }
+
+    .user-name {
+        font-size: 1rem;
+    }
+
+    .user-role {
+        font-size: 1.52rem;
+    }
+
+    .main-sidebar .close {
+        display: flex;
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        align-items: center;
+        justify-content: center;
+        padding: 4px;
     }
 }
 

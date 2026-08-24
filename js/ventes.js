@@ -148,8 +148,8 @@ function displaySalesTable(ventes = filteredSales) {
   pagedVentes.forEach((vente) => {
     const row = document.createElement("tr");
     row.innerHTML = `
-            <td>${vente.client}</td>
-            <td>${vente.telephone || "-"}</td>
+            <td>${escapeHtml(vente.client)}</td>
+            <td>${escapeHtml(vente.telephone || "-")}</td>
             <td>${formatDate(vente.date_vente)}</td>
             <td>${formatCurrency(vente.prixTotal ?? vente.totalHT ?? 0)}</td>
             <td>${formatCurrency(vente.prixRecu ?? 0)}</td>
@@ -348,8 +348,8 @@ function displayDetailsTable() {
   pagedDetails.forEach((item) => {
     const row = document.createElement("tr");
     row.innerHTML = `
-        <td>${item.designation ?? "-"}</td>
-        <td>${item.caracteristique ?? "-"}</td>
+        <td>${escapeHtml(item.designation ?? "-")}</td>
+        <td>${escapeHtml(item.caracteristique ?? "-")}</td>
         <td>${item.quantite}</td>
         <td>${formatCurrency(item.prixUnitaire)}</td>
         <td>${formatCurrency(item.montant)}</td>
@@ -603,8 +603,8 @@ function updateProductsList() {
   addedProducts.forEach((product, index) => {
     const row = document.createElement("tr");
     row.innerHTML = `
-            <td>${product.designation}</td>
-            <td>${product.caracteristique}</td>
+            <td>${escapeHtml(product.designation)}</td>
+            <td>${escapeHtml(product.caracteristique)}</td>
             <td>${product.quantite}</td>
             <td>${formatCurrency(product.prixUnitaire)}</td>
             <td>${formatCurrency(product.montant)}</td>
@@ -663,8 +663,8 @@ function updateInvoice() {
 
       const row = document.createElement("tr");
       row.innerHTML = `
-                <td>${product.designation}</td>
-                <td>${product.caracteristique}</td>
+                <td>${escapeHtml(product.designation)}</td>
+                <td>${escapeHtml(product.caracteristique)}</td>
                 <td>${product.quantite}</td>
                 <td>${formatCurrency(product.prixUnitaire)}</td>
                 <td>${formatCurrency(montant)}</td>
@@ -884,17 +884,25 @@ function validateAndSubmitSale(
     body: formData,
   })
     .then((response) => {
-      // Vérifier que la réponse est du texte avant de parser
-      const contentType = response.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        return response.text().then((text) => {
+      return response.text().then((text) => {
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (error) {
           console.error("Réponse non-JSON reçue:", text);
-          throw new Error(
-            "Réponse du serveur invalide: " + text.substring(0, 200)
+          throw new Error("Le serveur n'a pas renvoyé une réponse valide");
+        }
+
+        if (!response.ok) {
+          const authorizationError = new Error(
+            data.message || "Action non autorisée"
           );
-        });
-      }
-      return response.json();
+          authorizationError.isUserMessage = true;
+          throw authorizationError;
+        }
+
+        return data;
+      });
     })
     .then((data) => {
       if (data.success) {
@@ -912,7 +920,10 @@ function validateAndSubmitSale(
     })
     .catch((err) => {
       console.error("Erreur:", err);
-      showNotification("Erreur: " + err.message, "error");
+      showNotification(
+        err.isUserMessage ? err.message : "Erreur: " + err.message,
+        "error"
+      );
     });
 }
 
@@ -1073,8 +1084,8 @@ function generatePDF(sale = null, details = null) {
         (parseFloat(item.prixUnitaire) || 0) * (parseInt(item.quantite) || 0);
       lignesProduits += `
       <tr>
-        <td>${item.designation ?? "-"}</td>
-        <td>${item.caracteristique ?? "-"}</td>
+        <td>${escapeHtml(item.designation ?? "-")}</td>
+        <td>${escapeHtml(item.caracteristique ?? "-")}</td>
         <td style="text-align:center">${item.quantite}</td>
         <td style="text-align:right">${formatCurrency(
           item.prixUnitaire || 0
@@ -1359,8 +1370,8 @@ function printViewedSale() {
       (parseFloat(item.prixUnitaire) || 0) * (parseInt(item.quantite) || 0);
     lignesProduits += `
       <tr>
-        <td>${item.designation ?? "-"}</td>
-        <td>${item.caracteristique ?? "-"}</td>
+        <td>${escapeHtml(item.designation ?? "-")}</td>
+        <td>${escapeHtml(item.caracteristique ?? "-")}</td>
         <td style="text-align:center">${item.quantite}</td>
         <td style="text-align:right">${formatCurrency(
           item.prixUnitaire || 0

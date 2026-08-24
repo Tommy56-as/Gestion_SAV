@@ -28,26 +28,22 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `approvisionnement` (
-  `idApp` int(11) NOT NULL,
-  `produit` varchar(100) NOT NULL,
-  `caracteristique` varchar(100) NOT NULL,
-  `quantite_stock` varchar(100) DEFAULT NULL,
-  `quantite_app` varchar(100) DEFAULT NULL,
-  `Prix_total` double DEFAULT NULL,
-  `fournisseur` varchar(100) DEFAULT NULL,
-  `date_app` date DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+    `idApp` INT(11) NOT NULL AUTO_INCREMENT,
+    `idproduit` INT(11) NOT NULL,
+    `quantite_stock` INT(11) NOT NULL,
+    `quantite_app` INT(11) NOT NULL,
+    `prix_total` DECIMAL(12,2) DEFAULT NULL,
+    `idfour` INT(11) DEFAULT NULL,
+    `statut` ENUM('encours', 'terminee') NOT NULL DEFAULT 'encours',
+    `date_app` DATE NOT NULL DEFAULT (CURRENT_DATE),
+
+    PRIMARY KEY (`idApp`)
+
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_general_ci;
 
 --
--- Déchargement des données de la table `approvisionnement`
---
-
-INSERT INTO `approvisionnement` (`idApp`, `produit`, `caracteristique`, `quantite_stock`, `quantite_app`, `Prix_total`, `fournisseur`, `date_app`) VALUES
-(1, 'Laptop hp Corei5 6gen', 'Hdd500go/Ram8go/dd2go/cpu2GHz', '10', '5', 1000000, 'Waffo john', '2025-07-25'),
-(2, 'Laptop hp Corei5 6gen', 'Hdd500go/Ram8go/dd2go/cpu2GHz', '0', '10', 1000000, 'Waffo john', '2025-08-28');
-
--- --------------------------------------------------------
-
 --
 -- Structure de la table `fournisseur`
 --
@@ -464,7 +460,8 @@ CREATE INDEX idx_details_vente_idvente ON `details_vente`(`idvente`);
 -- Index pour la table `approvisionnement`
 --
 ALTER TABLE `approvisionnement`
-  ADD PRIMARY KEY (`idApp`);
+  ADD KEY `idx_approvisionnement_produit` (`idproduit`),
+  ADD KEY `idx_approvisionnement_fournisseur` (`idfour`);
 
 --
 -- Index pour la table `fournisseur`
@@ -596,6 +593,14 @@ ALTER TABLE `vente`
 --
 ALTER TABLE `fournisseur`
   ADD CONSTRAINT `fournisseur_ibfk_1` FOREIGN KEY (`produit_livré`) REFERENCES `produit` (`idproduit`);
+
+ALTER TABLE `approvisionnement`
+  ADD CONSTRAINT `fk_approvisionnement_produit`
+    FOREIGN KEY (`idproduit`) REFERENCES `produit` (`idproduit`)
+    ON UPDATE CASCADE ON DELETE RESTRICT,
+  ADD CONSTRAINT `fk_approvisionnement_fournisseur`
+    FOREIGN KEY (`idfour`) REFERENCES `fournisseur` (`idfour`)
+    ON UPDATE CASCADE ON DELETE SET NULL;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

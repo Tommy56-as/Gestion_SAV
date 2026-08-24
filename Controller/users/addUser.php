@@ -2,6 +2,8 @@
 require_once '../admin_auth.php';
 require_once '../../inc/Database.php';
 require_once '../../inc/history.php';
+require_admin();
+require_csrf();
 header('Content-Type: application/json');
 
 if($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -60,7 +62,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
     } catch(PDOException $e) {
         http_response_code(500);
-        echo json_encode(['success' => false, 'message' => 'Erreur: ' . $e->getMessage()]);
+        error_log('Erreur ajout utilisateur: ' . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Erreur lors de la création de l’utilisateur']);
     }
 } else {
     http_response_code(405);

@@ -1,6 +1,8 @@
 <?php
 //// update_produit.php
 require_once '../admin_auth.php';
+require_permission('produit.update');
+require_csrf();
 require_once '../../inc/Database.php';
 require_once '../../inc/history.php';
 header('Content-Type: application/json');
@@ -26,16 +28,27 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['idproduit'])) {
         
         // Gestion de l'image si fournie
         if(isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            $imagePath = '../../img/' . basename($_FILES['image']['name']);
-            move_uploaded_file($_FILES['image']['tmp_name'], $imagePath);
+            $imageTmpPath = $_FILES['image']['tmp_name'];
+            $mime = (new finfo(FILEINFO_MIME_TYPE))->file($imageTmpPath);
+            $allowedTypes = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/gif' => 'gif'];
+            if (!isset($allowedTypes[$mime]) || @getimagesize($imageTmpPath) === false || $_FILES['image']['size'] > 3 * 1024 * 1024) {
+                throw new Exception('Type ou taille d\'image non autorisé');
+            }
+            $imageName = bin2hex(random_bytes(16)) . '.' . $allowedTypes[$mime];
+            $imagePath = realpath(__DIR__ . '/../../img') . DIRECTORY_SEPARATOR . $imageName;
+            if (!move_uploaded_file($imageTmpPath, $imagePath)) {
+                throw new Exception('Erreur lors du téléchargement de l\'image');
+            }
             
             $stmt = $pdo->prepare("UPDATE produit SET image = ? WHERE idproduit = ?");
-            $stmt->execute([$imagePath, $idproduit]);
+            $stmt->execute([$imageName, $idproduit]);
         }
         
         echo json_encode(['success' => true, 'message' => 'Produit mis à jour avec succès']);
     } catch(PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'Erreur: ' . $e->getMessage()]);
+        error_log('Erreur mise à jour produit: ' . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Erreur lors de la mise à jour du produit']);
     }
 } else {
     echo json_encode(['success' => false, 'message' => 'Paramètres manquants']);

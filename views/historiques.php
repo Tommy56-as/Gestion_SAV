@@ -68,7 +68,11 @@ $historyQuery = ['history_search' => $search, 'history_date' => $date];
             <span>événement<?= $totalRows > 1 ? 's' : '' ?></span>
         </div>
     </div>
-
+    <header class="header-right">
+        <button class="toggle-menu-btn" id="openSidebar">
+            <span class="material-icons-sharp">menu</span>
+        </button>
+    </header>
     <form class="history-filters" method="get" action="home.php">
         <input type="hidden" name="page" value="historiques">
         <label>

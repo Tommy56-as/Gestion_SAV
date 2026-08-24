@@ -10,6 +10,23 @@ try {
     $stmt = $pdo->query($sql_total);
     $result_total = $stmt->fetch(PDO::FETCH_ASSOC);
     $total = $result_total['total'] ?: 0;
+
+    // Comparaison annuelle des commandes d'approvisionnement et des ventes.
+    $annee_dashboard = filter_input(INPUT_GET, 'annee', FILTER_VALIDATE_INT);
+    $annee_dashboard = ($annee_dashboard >= 2000 && $annee_dashboard <= (int)date('Y'))
+        ? $annee_dashboard
+        : (int)date('Y');
+    $stmt = $pdo->prepare("SELECT
+        (SELECT COALESCE(SUM(a.prix_total), 0) FROM approvisionnement a WHERE YEAR(a.date_app) = ? AND statut = 'terminee') AS total_commandes,
+        (SELECT COALESCE(SUM(d.montant), 0) FROM vente v INNER JOIN details_vente d ON d.idvente = v.idvente WHERE YEAR(v.date_vente) = ?) AS total_ventes");
+    $stmt->execute([$annee_dashboard, $annee_dashboard]);
+    $result_annuel = $stmt->fetch(PDO::FETCH_ASSOC);
+    $total_commandes_annuel = (float)($result_annuel['total_commandes'] ?? 0);
+    $total_ventes_annuel = (float)($result_annuel['total_ventes'] ?? 0);
+    $ecart_annuel = $total_ventes_annuel - $total_commandes_annuel;
+    $taux_couverture_annuel = $total_commandes_annuel > 0
+        ? ($total_ventes_annuel / $total_commandes_annuel) * 100
+        : 0;
     
     //montant journalier
     $sql_total_jour = "SELECT SUM(d.montant) AS total FROM vente v 
@@ -22,22 +39,22 @@ try {
     //utilisateurs actifs/bloques
     $sql_user = "SELECT SUM(CASE WHEN Statut = FALSE THEN 1 ELSE 0 END) AS nb_actifs,
                         SUM(CASE WHEN Statut = TRUE  THEN 1 ELSE 0 END) AS nb_bloques
-                 FROM utilisateur";
+                 FROM utilisateur WHERE supprime = 0";
     $stmt = $pdo->query($sql_user);
     $result_user = $stmt->fetch(PDO::FETCH_ASSOC);
     $user_actif  = $result_user['nb_actifs'] ?: 0;
     $user_bloque = $result_user['nb_bloques'] ?: 0;
 
     //reparations en cours - en attente - terminée
-    $sql_reparation = "SELECT SUM(CASE WHEN statut = 'en cours' THEN 1 ELSE 0 END) AS en_cours,
-                              SUM(CASE WHEN statut = 'en attente' THEN 1 ELSE 0 END) AS en_attente,
-                              SUM(CASE WHEN statut = 'terminée' THEN 1 ELSE 0 END) AS terminée
+    $sql_reparation = "SELECT SUM(CASE WHEN statut = 'en_cours' THEN 1 ELSE 0 END) AS en_cours,
+                              SUM(CASE WHEN statut = 'en_attente' THEN 1 ELSE 0 END) AS en_attente,
+                              SUM(CASE WHEN statut = 'terminee' THEN 1 ELSE 0 END) AS terminee
                        FROM reparation";
     $stmt = $pdo->query($sql_reparation);
     $result_reparation = $stmt->fetch(PDO::FETCH_ASSOC);
     $en_cours  = $result_reparation['en_cours'] ?: 0;
     $en_attente = $result_reparation['en_attente'] ?: 0;
-    $terminee = $result_reparation['terminée'] ?: 0;
+    $terminee = $result_reparation['terminee'] ?: 0;
 
     /* ===== ANALYSE DES PERFORMANCES (PASSÉ) ===== */
 
@@ -64,20 +81,10 @@ try {
     }
     $max_7j = max(array_column($ventes_7j, 'total')) ?: 1;
 
-    // Ventes mois courant vs mois précédent
-    $sql_mois = "SELECT 
-                    COALESCE(SUM(CASE WHEN MONTH(v.date_vente) = MONTH(CURDATE()) AND YEAR(v.date_vente) = YEAR(CURDATE()) THEN d.montant ELSE 0 END), 0) AS mois_courant,
-                    COALESCE(SUM(CASE WHEN MONTH(v.date_vente) = MONTH(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) AND YEAR(v.date_vente) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) THEN d.montant ELSE 0 END), 0) AS mois_precedent
-                    FROM vente v
-                    LEFT JOIN details_vente d ON v.idvente = d.idvente";
-    $stmt = $pdo->query($sql_mois);
-    $result_mois = $stmt->fetch(PDO::FETCH_ASSOC);
-    $mois_courant = (float)$result_mois['mois_courant'];
-    $mois_precedent = (float)$result_mois['mois_precedent'];
-    $evolution_pct = $mois_precedent > 0 ? (($mois_courant - $mois_precedent) / $mois_precedent) * 100 : 0;
-    $mois_fr = ['', 'Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-    $nom_mois_courant = $mois_fr[(int)date('n')];
-    $nom_mois_precedent = $mois_fr[(int)date('n', strtotime('first day of last month'))];
+    // Montant total des réparations enregistrées.
+    $stmt = $pdo->query("SELECT COALESCE(SUM(prixTotal), 0) AS total_reparations FROM reparation WHERE statut IN ('terminee')");
+    $result_reparations = $stmt->fetch(PDO::FETCH_ASSOC);
+    $total_reparations = (float)($result_reparations['total_reparations'] ?? 0);
 
     // Top 5 produits les plus vendus
     $stmt = $pdo->query("SELECT COALESCE(p.designation) AS designation, COALESCE( p.caracteristique) AS caracteristique, 
@@ -113,7 +120,7 @@ try {
     // Réparations en attente (détail)
     $stmt = $pdo->query("SELECT idrep, nomClient, appareil, telephone, statut
                          FROM reparation
-                         WHERE statut = 'en attente'
+                         WHERE statut = 'en_attente'
                          ORDER BY idrep DESC
                          LIMIT 6 ");
     $reparations_attente = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -122,6 +129,11 @@ try {
     echo ("Erreur: " . $e->getMessage());
     $total = 0;
     $total_jour = 0;
+    $annee_dashboard = (int)date('Y');
+    $total_commandes_annuel = 0;
+    $total_ventes_annuel = 0;
+    $ecart_annuel = 0;
+    $taux_couverture_annuel = 0;
     $user_actif = 0;
     $user_bloque = 0;
     $en_cours  =  0;
@@ -129,11 +141,7 @@ try {
     $terminee =  0;
     $ventes_7j = [];
     $max_7j = 1;
-    $mois_courant = 0;
-    $mois_precedent = 0;
-    $evolution_pct = 0;
-    $nom_mois_courant = date('F');
-    $nom_mois_precedent = date('F', strtotime('last month'));
+    $total_reparations = 0;
     $top_produits = [];
     $max_top = 1;
     $alertes_stock = [];
@@ -211,6 +219,36 @@ $date_fr = $jours_fr[(int)$date_aujourdhui->format('w')] . ' ' . $date_aujourdhu
                 Aujourd'hui
             </span>
             <span class="dash-card-sub"><?= $date_aujourdhui->format('d/m/Y') ?></span>
+        </div>
+    </div>
+
+    <div class="dash-card dash-animate accent-success dash-annual-card">
+        <div class="dash-card-top">
+            <span class="dash-card-icon material-icons-sharp">compare_arrows</span>
+            <span class="dash-card-label">Commandes annuelles</span>
+        </div>
+        <form class="dash-year-form" method="get">
+            <input type="hidden" name="page" value="dashboard">
+            <label for="anneeDashboard">Année</label>
+            <select id="anneeDashboard" name="annee" onchange="this.form.submit()">
+                <?php for ($annee = (int)date('Y'); $annee >= 2020; $annee--): ?>
+                <option value="<?= $annee ?>" <?= $annee === $annee_dashboard ? 'selected' : '' ?>><?= $annee ?>
+                </option>
+                <?php endfor; ?>
+            </select>
+        </form>
+        <div class="dash-annual-values">
+            <div><span>Commandes</span><strong><?= number_format($total_commandes_annuel, 0, ',', ' ') ?>
+                    <small>FCFA</small></strong></div>
+            <div><span>Ventes</span><strong><?= number_format($total_ventes_annuel, 0, ',', ' ') ?>
+                    <small>FCFA</small></strong></div>
+        </div>
+        <div class="dash-card-footer">
+            <span class="dash-card-trend <?= $ecart_annuel >= 0 ? 'annual-positive' : 'annual-negative' ?>">
+                <span class="material-icons-sharp"><?= $ecart_annuel >= 0 ? 'trending_up' : 'trending_down' ?></span>
+                Écart <?= $ecart_annuel >= 0 ? '+' : '' ?><?= number_format($ecart_annuel, 0, ',', ' ') ?> FCFA
+            </span>
+            <span class="dash-card-sub"><?= number_format($taux_couverture_annuel, 1, ',', ' ') ?>% couverture</span>
         </div>
     </div>
 
@@ -325,40 +363,21 @@ $date_fr = $jours_fr[(int)$date_aujourdhui->format('w')] . ' ' . $date_aujourdhu
         </div>
     </div>
 
-    <!-- Comparaison mensuelle -->
+    <!-- Montant total des réparations -->
     <div class="dash-panel">
         <div class="dash-panel-header">
             <div class="dash-panel-title">
-                <span class="dash-panel-icon accent-cyan material-icons-sharp">compare_arrows</span>
+                <span class="dash-panel-icon accent-success material-icons-sharp">build</span>
                 <div>
-                    <h3>Comparaison mensuelle</h3>
-                    <p>Évolution du chiffre d'affaires</p>
+                    <h3>Total des réparations</h3>
+                    <p>Montant cumulé des réparations</p>
                 </div>
             </div>
-            <span class="dash-panel-total <?= $evolution_pct >= 0 ? 'accent-success' : 'accent-danger' ?>">
-                <span class="material-icons-sharp"><?= $evolution_pct >= 0 ? 'trending_up' : 'trending_down' ?></span>
-                <?= $evolution_pct >= 0 ? '+' : '' ?><?= number_format($evolution_pct, 1, ',', ' ') ?>%
-            </span>
+            <span class="dash-panel-total accent-success">Réparations</span>
         </div>
-        <div class="dash-compare">
-            <div class="dash-compare-item">
-                <span class="dash-compare-label"><?= $nom_mois_courant ?></span>
-                <span class="dash-compare-value"><?= number_format($mois_courant, 0, ',', ' ') ?>
-                    <small>FCFA</small></span>
-                <div class="dash-compare-bar accent-fuscha" style="width: 100%;"></div>
-            </div>
-            <div class="dash-compare-item">
-                <span class="dash-compare-label"><?= $nom_mois_precedent ?></span>
-                <span class="dash-compare-value"><?= number_format($mois_precedent, 0, ',', ' ') ?>
-                    <small>FCFA</small></span>
-                <?php $pct_bar = $mois_courant > 0 ? min(round(($mois_precedent / $mois_courant) * 100), 100) : 0; ?>
-                <div class="dash-compare-bar accent-cyan" style="width: <?= max($pct_bar, 3) ?>%;"></div>
-            </div>
-            <div class="dash-compare-note <?= $evolution_pct >= 0 ? 'accent-success-text' : 'accent-danger-text' ?>">
-                <span class="material-icons-sharp"><?= $evolution_pct >= 0 ? 'arrow_upward' : 'arrow_downward' ?></span>
-                <?= $evolution_pct >= 0 ? 'Progression' : 'Baisse' ?> de
-                <?= number_format(abs($evolution_pct), 1, ',', ' ') ?>% par rapport au mois précédent
-            </div>
+        <div class="dash-repair-total">
+            <span class="material-icons-sharp">payments</span>
+            <strong><?= number_format($total_reparations, 0, ',', ' ') ?> <small>FCFA</small></strong>
         </div>
     </div>
 
