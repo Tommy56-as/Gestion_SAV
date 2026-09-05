@@ -12,6 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $iduser = filter_input(INPUT_POST, 'iduser', FILTER_VALIDATE_INT);
+$entrepriseId = require_current_entreprise_id();
 $pieces = json_decode($_POST['pieces'] ?? '[]', true);
 $mainOeuvre = max(0, (float)($_POST['main_oeuvre'] ?? 0));
 $nomClient = trim($_POST['nomClient'] ?? '');
@@ -29,22 +30,22 @@ if (!$iduser || !$nomClient || !$telephone || !$appareil || !is_array($pieces) |
 
 try {
     $pdo->beginTransaction();
-    $technicianStatement = $pdo->prepare("SELECT idUser FROM utilisateur WHERE idUser = ? AND TypeDeCompte = 'Technicien' AND Statut = 0");
-    $technicianStatement->execute([$iduser]);
+    $technicianStatement = $pdo->prepare("SELECT idUser FROM utilisateur WHERE idEntreprise = ? AND idUser = ? AND TypeDeCompte = 'Technicien' AND Statut = 0 AND supprime = 0");
+    $technicianStatement->execute([$entrepriseId, $iduser]);
     if (!$technicianStatement->fetch()) {
         if ($pdo->inTransaction()) $pdo->rollBack();
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Technicien ou équipement invalide']);
         exit;
     }
-    $productStatement = $pdo->prepare("SELECT prixUnitaire, CAST(quantite AS UNSIGNED) AS stock FROM produit WHERE idproduit = ? AND categorie = 'equipement' FOR UPDATE");
+    $productStatement = $pdo->prepare("SELECT prixUnitaire, CAST(quantite AS UNSIGNED) AS stock FROM produit WHERE idEntreprise = ? AND idproduit = ? AND categorie = 'equipement' FOR UPDATE");
     $pieceRows = [];
     $totalPieces = 0;
     foreach ($pieces as $piece) {
         $pieceId = filter_var($piece['idproduit'] ?? null, FILTER_VALIDATE_INT);
         $pieceQuantity = filter_var($piece['quantite'] ?? null, FILTER_VALIDATE_INT);
         if (!$pieceId || !$pieceQuantity || $pieceQuantity < 1) throw new RuntimeException('Pièce invalide');
-        $productStatement->execute([$pieceId]);
+        $productStatement->execute([$entrepriseId, $pieceId]);
         $product = $productStatement->fetch(PDO::FETCH_ASSOC);
         if (!$product || (int)$product['stock'] < $pieceQuantity) throw new RuntimeException('Stock insuffisant pour une pièce');
         $unitPrice = (float)($product['prixUnitaire'] ?? 0);
@@ -54,15 +55,15 @@ try {
     }
     $prixTotal = $totalPieces + $mainOeuvre;
     $statement = $pdo->prepare("INSERT INTO reparation
-        (iduser, nomClient, telephone, email, appareil, diagnostic, solution, statut, quantite, prixUnitaire, prixTotal, main_oeuvre)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 'en_attente', 0, 0, ?, ?)");
-    $statement->execute([$iduser, $nomClient, $telephone, $email ?: null, $appareil, $diagnostic ?: null, $solution ?: null, $prixTotal, $mainOeuvre]);
+        (idEntreprise, iduser, nomClient, telephone, email, appareil, diagnostic, solution, statut, quantite, prixUnitaire, prixTotal, main_oeuvre)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'en_attente', 0, 0, ?, ?)");
+    $statement->execute([$entrepriseId, $iduser, $nomClient, $telephone, $email ?: null, $appareil, $diagnostic ?: null, $solution ?: null, $prixTotal, $mainOeuvre]);
     $idrep = $pdo->lastInsertId();
     $pieceInsert = $pdo->prepare('INSERT INTO reparation_piece (idrep, idproduit, quantite, prix_unitaire, montant) VALUES (?, ?, ?, ?, ?)');
-    $stockUpdate = $pdo->prepare('UPDATE produit SET quantite = quantite - ? WHERE idproduit = ?');
+    $stockUpdate = $pdo->prepare('UPDATE produit SET quantite = quantite - ? WHERE idEntreprise = ? AND idproduit = ?');
     foreach ($pieceRows as [$pieceId, $pieceQuantity, $unitPrice, $amount]) {
         $pieceInsert->execute([$idrep, $pieceId, $pieceQuantity, $unitPrice, $amount]);
-        $stockUpdate->execute([$pieceQuantity, $pieceId]);
+        $stockUpdate->execute([$pieceQuantity, $entrepriseId, $pieceId]);
     }
     $pdo->commit();
     log_history($pdo, "Création de la réparation de {$nomClient}");

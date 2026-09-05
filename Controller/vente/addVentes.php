@@ -8,9 +8,11 @@ header('Content-Type: application/json');
 
 // ajout d'une vente
 if($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $entrepriseId = require_current_entreprise_id();
     // Validation des champs requis
     $client = $_POST['client'] ?? null;
-    $date_vente = $_POST['date_vente'] ?? null;
+    // La date de vente est fixée par le serveur et ne peut pas être modifiée.
+    $date_vente = date('Y-m-d');
     $telephone = $_POST['telephone'] ?? null;
     $totalHT = $_POST['totalHT'] ?? 0;
     $tauxReduction = $_POST['tauxReduction'] ?? 0;
@@ -28,12 +30,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    if(empty($date_vente)) {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'message' => 'La date de vente est requise']);
-        exit;
-    }
-
     if(empty($produits)) {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Au moins un produit doit être ajouté']);
@@ -46,10 +42,30 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    $saleDateObject = new DateTimeImmutable($date_vente);
+    foreach ($produits as $produit) {
+        $warrantyDate = trim((string) ($produit['finGarantie'] ?? ''));
+        if ($warrantyDate === '') {
+            continue;
+        }
+
+        $warrantyDateObject = DateTimeImmutable::createFromFormat('!Y-m-d', $warrantyDate);
+        if (!$warrantyDateObject || $warrantyDateObject->format('Y-m-d') !== $warrantyDate) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'La date de fin de garantie est invalide']);
+            exit;
+        }
+        if ($warrantyDateObject < $saleDateObject) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'La fin de garantie ne peut pas être antérieure à la date de vente']);
+            exit;
+        }
+    }
+
     try {
         // Insérer la vente (entête)
-        $stmt = $pdo->prepare("INSERT INTO vente (created_by, client, telephone, date_vente, totalHT) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([current_user_id(), $client, $telephone, $date_vente, $totalHT]);
+        $stmt = $pdo->prepare("INSERT INTO vente (idEntreprise, created_by, client, telephone, date_vente, totalHT) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$entrepriseId, current_user_id(), $client, $telephone, $date_vente, $totalHT]);
         $idvente = $pdo->lastInsertId();
 
         // Insérer les détails des produits dans details_vente
@@ -57,7 +73,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     montantReduction, totalApresReduction, moyenPaiement,finGarantie) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         
         // Préparer la requête pour réduire le stock
-        $updateStockStmt = $pdo->prepare("UPDATE produit SET quantite = quantite - ? WHERE idproduit = ?");
+        $updateStockStmt = $pdo->prepare("UPDATE produit SET quantite = quantite - ? WHERE idEntreprise = ? AND idproduit = ?");
         
         foreach($produits as $produit) {
             $montant = ($produit['prixUnitaire'] ?? 0) * ($produit['quantite'] ?? 0);
@@ -82,7 +98,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Réduire la quantité en stock dans la table produit
             if ($idproduit && $quantite > 0) {
-                $updateStockStmt->execute([$quantite, $idproduit]);
+                $updateStockStmt->execute([$quantite, $entrepriseId, $idproduit]);
             }
         }
 

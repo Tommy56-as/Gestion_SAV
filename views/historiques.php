@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../inc/Database.php';
+$entrepriseId = require_current_entreprise_id();
 
 $search = trim($_GET['history_search'] ?? '');
 $date = $_GET['history_date'] ?? '';
@@ -7,7 +8,8 @@ $pageNumber = max(1, (int) ($_GET['history_page'] ?? 1));
 $perPage = 15;
 
 $conditions = [];
-$parameters = [];
+$conditions[] = 'idEntreprise = :entreprise_id';
+$parameters = [':entreprise_id' => $entrepriseId];
 
 if ($search !== '') {
 	$conditions[] = '(utilisateur LIKE :search OR `operation_effectuée` LIKE :search)';

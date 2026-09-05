@@ -8,6 +8,7 @@ require_csrf();
 header('Content-Type: application/json');
 
 $userId = filter_input(INPUT_POST, 'idUser', FILTER_VALIDATE_INT);
+$entrepriseId = require_current_entreprise_id();
 if (!$userId || $userId === current_user_id()) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Utilisateur invalide ou session actuelle']);
@@ -15,10 +16,10 @@ if (!$userId || $userId === current_user_id()) {
 }
 
 try {
-    $statement = $pdo->prepare("SELECT Nom_Utilisateur FROM utilisateur WHERE idUser = ? AND supprime = 0");
-    $statement->execute([$userId]);
+    $statement = $pdo->prepare("SELECT Nom_Utilisateur FROM utilisateur WHERE idEntreprise = ? AND idUser = ? AND supprime = 0");
+    $statement->execute([$entrepriseId, $userId]);
     $name = $statement->fetchColumn();
-    if (!$name || !soft_delete($pdo, 'user', $userId)) {
+    if (!$name || !soft_delete($pdo, 'user', $userId, $entrepriseId)) {
         http_response_code(404);
         echo json_encode(['success' => false, 'message' => 'Utilisateur introuvable']);
         exit;

@@ -22,8 +22,10 @@ if (!$userId || !is_array($permissions)) {
 }
 
 try {
-    $check = $pdo->prepare("SELECT idUser FROM utilisateur WHERE idUser = ? AND TypeDeCompte <> 'Administrateur'");
-    $check->execute([$userId]);
+    $entrepriseId = require_current_entreprise_id();
+    $check = $pdo->prepare("SELECT idUser FROM utilisateur
+        WHERE idUser = ? AND idEntreprise = ? AND TypeDeCompte <> 'Administrateur' AND supprime = 0");
+    $check->execute([$userId, $entrepriseId]);
     if (!$check->fetch()) throw new RuntimeException('Utilisateur introuvable');
 
     $pdo->beginTransaction();

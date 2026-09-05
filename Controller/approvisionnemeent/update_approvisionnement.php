@@ -21,10 +21,11 @@ if (!$idApp || !in_array($statut, ['encours', 'terminee'], true)) {
 }
 
 try {
+    $entrepriseId = require_current_entreprise_id();
     // Verrouiller la commande pendant la modification pour éviter un double mouvement de stock.
     $pdo->beginTransaction();
-    $stmt = $pdo->prepare('SELECT idproduit, quantite_app, statut FROM approvisionnement WHERE idApp = ? FOR UPDATE');
-    $stmt->execute([$idApp]);
+    $stmt = $pdo->prepare('SELECT idproduit, quantite_app, statut FROM approvisionnement WHERE idEntreprise = ? AND idApp = ? FOR UPDATE');
+    $stmt->execute([$entrepriseId, $idApp]);
     $commande = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$commande) {
         throw new RuntimeException('Commande introuvable');
@@ -41,10 +42,10 @@ try {
 
     // Réception : ajout au stock. Réouverture : annulation de cet ajout.
     $delta = $statut === 'terminee' ? (int) $commande['quantite_app'] : -(int) $commande['quantite_app'];
-    $stockStmt = $pdo->prepare('UPDATE produit SET quantite = quantite + ? WHERE idproduit = ?');
-    $stockStmt->execute([$delta, $commande['idproduit']]);
-    $updateStmt = $pdo->prepare('UPDATE approvisionnement SET statut = ? WHERE idApp = ?');
-    $updateStmt->execute([$statut, $idApp]);
+    $stockStmt = $pdo->prepare('UPDATE produit SET quantite = quantite + ? WHERE idEntreprise = ? AND idproduit = ?');
+    $stockStmt->execute([$delta, $entrepriseId, $commande['idproduit']]);
+    $updateStmt = $pdo->prepare('UPDATE approvisionnement SET statut = ? WHERE idEntreprise = ? AND idApp = ?');
+    $updateStmt->execute([$statut, $entrepriseId, $idApp]);
     // Le stock et le statut doivent être validés ensemble.
     $pdo->commit();
     log_history($pdo, "Commande d'approvisionnement {$idApp} : {$statut}");

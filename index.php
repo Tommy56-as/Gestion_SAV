@@ -2,6 +2,22 @@
 
 // Inclure la gestion de l'authentification
 require_once('inc/auth.php');
+
+$installationSuccess = $_SESSION['installation_success'] ?? null;
+unset($_SESSION['installation_success']);
+
+// Une base SaaS migree mais sans entreprise doit commencer par l'installation.
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    try {
+        $installationExists = (bool) $pdo->query('SELECT 1 FROM entreprises LIMIT 1')->fetchColumn();
+        if (!$installationExists) {
+            header('Location: install.php');
+            exit;
+        }
+    } catch (PDOException $exception) {
+        // Les anciennes installations restent accessibles avant application de la migration SaaS.
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -24,6 +40,7 @@ require_once('inc/auth.php');
 <body>
     <div class="container">
         <div class="header">
+            <p class="login-kicker">Votre espace de travail</p>
             <div
                 style="margin-bottom: 20px;display: flex;justify-content: center;align-items: center;border-radius: 9px;">
                 <img src="img/miner.jpg" alt="Logo Gestion SAV"
@@ -32,6 +49,7 @@ require_once('inc/auth.php');
             <h1 style="font-size: 2.5rem;text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);margin-bottom: 10px;">
                 Gestion des Services Apres-Ventes
             </h1>
+            <p class="login-promise">Suivez vos ventes, vos réparations et vos clients depuis un seul espace.</p>
         </div>
         <div class="forms-container">
             <!-- Connexion Form -->
@@ -39,6 +57,13 @@ require_once('inc/auth.php');
                 <h2 style="font-size: 2.5rem;text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);margin-bottom: 10px;">
                     Connexion
                 </h2>
+                <p class="login-intro temporary-message">Ravi de vous revoir. Connectez-vous pour retrouver votre activité.</p>
+                <?php if ($installationSuccess): ?>
+                <div class="installation-success" role="status">
+                    <i class="fas fa-check-circle"></i>
+                    <span><?php echo htmlspecialchars($installationSuccess, ENT_QUOTES, 'UTF-8'); ?></span>
+                </div>
+                <?php endif; ?>
                 <!-- Affichage des messages d'erreur disparait apres 5s, refresh ou bouton dismiss-->
                 <?php if(isset($message) && !empty($message)): ?>
                 <div class="error-messages" id="error-messages" style="margin-bottom: 20px;">

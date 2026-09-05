@@ -13,14 +13,15 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 
     try {
+        $entrepriseId = require_current_entreprise_id();
          $stmt = $pdo->prepare("SELECT v.*,
                            (SELECT COALESCE(SUM(d.montant), 0) FROM details_vente d WHERE d.idvente = v.idvente) AS montant,
                            (SELECT COALESCE(SUM(d.montantReduction), 0) FROM details_vente d WHERE d.idvente = v.idvente) AS montantReduction,
                            (SELECT COALESCE(MAX(d.prixRecu), 0) FROM details_vente d WHERE d.idvente = v.idvente) AS prixRecu,
                            (SELECT COALESCE(MAX(d.remboursement), 0) FROM details_vente d WHERE d.idvente = v.idvente) AS remboursement
                        FROM vente v
-                       WHERE v.idvente = ?");
-        $stmt->execute([$idvente]);
+                       WHERE v.idEntreprise = ? AND v.idvente = ?");
+        $stmt->execute([$entrepriseId, $idvente]);
         $vente = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$vente) {
@@ -31,8 +32,8 @@ if($_SERVER['REQUEST_METHOD'] === 'GET') {
         $stmt = $pdo->prepare("SELECT d.*, COALESCE(p.designation) AS designation, COALESCE( p.caracteristique) AS caracteristique
                                FROM details_vente d
                                LEFT JOIN produit p ON d.idproduit = p.idproduit
-                               WHERE d.idvente = ?");
-        $stmt->execute([$idvente]);
+                               WHERE d.idvente = ? AND p.idEntreprise = ?");
+        $stmt->execute([$idvente, $entrepriseId]);
         $details = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         echo json_encode(['success' => true, 'vente' => $vente, 'details' => $details]);

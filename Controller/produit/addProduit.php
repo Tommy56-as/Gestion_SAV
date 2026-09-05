@@ -9,6 +9,7 @@ require_once '../../inc/history.php';
 header('Content-Type: application/json');
 
 try {
+    $entrepriseId = require_current_entreprise_id();
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Validation des champs requis (texte)
         $required_fields = ['designation', 'caracteristique', 'quantite', 'quantite_min', 'prixUnitaire', 'categorie'];
@@ -29,6 +30,7 @@ try {
         $quantite_min = (int) trim($_POST['quantite_min']);
         $prixUnitaire = (double) trim($_POST['prixUnitaire']);
         $categorie = trim($_POST['categorie']);
+        $categorieId = get_or_create_category($pdo, $entrepriseId, $categorie);
 
         // Gestion de l'image
         $image_tmp_name = $_FILES['image']['tmp_name'];
@@ -51,23 +53,23 @@ try {
         $image_path = $image_folder . DIRECTORY_SEPARATOR . $image;
 
         // Vérifier si le produit existe déjà
-        $check_stmt = $pdo->prepare("SELECT * FROM produit WHERE designation = ? AND caracteristique = ?");
-        $check_stmt->execute([$designation, $caracteristique]);
+        $check_stmt = $pdo->prepare("SELECT * FROM produit WHERE idEntreprise = ? AND designation = ? AND caracteristique = ?");
+        $check_stmt->execute([$entrepriseId, $designation, $caracteristique]);
         if ($check_stmt->fetch()) {
             throw new Exception('Ce produit existe déjà');
         }
 
         // Insérer en base
-        $stmt = $pdo->prepare("INSERT INTO produit (designation, caracteristique, quantite, quantite_min, prixUnitaire, categorie, image) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$designation, $caracteristique, $quantite, $quantite_min, $prixUnitaire, $categorie, $image]);
+        $stmt = $pdo->prepare("INSERT INTO produit (idEntreprise, idCategorie, designation, caracteristique, quantite, quantite_min, prixUnitaire, categorie, image) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$entrepriseId, $categorieId, $designation, $caracteristique, $quantite, $quantite_min, $prixUnitaire, $categorie, $image]);
 
         $product_id = $pdo->lastInsertId();
 
         // Déplacer le fichier
         if (!move_uploaded_file($image_tmp_name, $image_path)) {
             // Si échec, supprimer l'entrée en base
-            $pdo->prepare("DELETE FROM produit WHERE idproduit = ?")->execute([$product_id]);
+            $pdo->prepare("DELETE FROM produit WHERE idEntreprise = ? AND idproduit = ?")->execute([$entrepriseId, $product_id]);
             throw new Exception('Erreur lors du téléchargement de l\'image');
         }
 

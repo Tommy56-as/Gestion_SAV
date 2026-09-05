@@ -629,7 +629,7 @@
 }
 
 .dash-rank.top {
-    background: linear-gradient(135deg, var(--fuscha), var(--cyan));
+    background: linear-gradient(135deg,  var(--cyan));
     color: var(--white);
 }
 
@@ -663,7 +663,7 @@
 }
 
 .dash-top-fill.accent-yellow {
-    background: linear-gradient(90deg, var(--yellow), var(--fuscha));
+    background: linear-gradient(90deg, var(--fuscha));
 }
 
 .dash-top-qte {

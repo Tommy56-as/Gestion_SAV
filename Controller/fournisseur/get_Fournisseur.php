@@ -11,6 +11,7 @@ if(isset($_GET['idfour'])) {
 
 // affihage d'un fournisseurs
 try {
+    $entrepriseId = require_current_entreprise_id();
     $stmt = $pdo->prepare("SELECT 
     f.idfour,
     nom,
@@ -24,8 +25,8 @@ try {
     statut
 FROM fournisseur f
 LEFT JOIN produit p ON p.idproduit = f.produit_livre
-WHERE f.idfour = ? AND f.supprime = 0 ");
-    $stmt->execute([$idfour]);
+WHERE f.idEntreprise = ? AND f.idfour = ? AND f.supprime = 0 ");
+    $stmt->execute([$entrepriseId, $idfour]);
     $fournisseur = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
  if($fournisseur) {

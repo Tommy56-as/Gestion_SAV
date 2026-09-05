@@ -2,6 +2,7 @@
 require_once '../admin_auth.php';
 require_once '../../inc/Database.php';
 require_once '../../inc/history.php';
+require_once '../../inc/saas.php';
 require_admin();
 require_csrf();
 header('Content-Type: application/json');
@@ -20,9 +21,15 @@ foreach ($required_fields as $field) {
 }
 
 $id = (int) $_POST['idUser'];
+$entrepriseId = require_current_entreprise_id();
+if ($id <= 0) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Utilisateur invalide']);
+    exit;
+}
 
-$targetStatement = $pdo->prepare('SELECT Nom_Utilisateur FROM utilisateur WHERE idUser = ?');
-$targetStatement->execute([$id]);
+$targetStatement = $pdo->prepare('SELECT Nom_Utilisateur FROM utilisateur WHERE idUser = ? AND idEntreprise = ? AND supprime = 0');
+$targetStatement->execute([$id, $entrepriseId]);
 $targetUser = $targetStatement->fetchColumn() ?: 'Utilisateur #' . $id;
 
 $sql = "
@@ -49,11 +56,17 @@ if (!empty($_POST['MotDePasse'])) {
     $params[':pwd'] = password_hash($_POST['MotDePasse'], PASSWORD_DEFAULT);
 }
 
-$sql .= " WHERE idUser = :idUser";
+$sql .= " WHERE idUser = :idUser AND idEntreprise = :entrepriseId AND supprime = 0";
 $params[':idUser'] = $id;
+$params[':entrepriseId'] = $entrepriseId;
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
+if ($stmt->rowCount() === 0) {
+    http_response_code(404);
+    echo json_encode(['success' => false, 'message' => 'Utilisateur introuvable']);
+    exit;
+}
 log_history($pdo, "Modification de l'utilisateur {$targetUser}");
 
 echo json_encode([

@@ -4,6 +4,12 @@
     padding: 10px;
 }
 
+#date_vente:disabled {
+    cursor: not-allowed;
+    opacity: 0.75;
+    background: var(--desaturate-cyan-2);
+}
+
 /* Modal de vente/facture */
 .vente-modal {
     display: none;
@@ -103,7 +109,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     width: 100%;
-    gap: 5px;  
+    gap: 5px;
     overflow-y: auto;
     flex: 1;
 }
@@ -758,12 +764,14 @@
     }
 
     @page {
-    size: 80mm auto;
-    margin: 3mm;
+        size: 80mm auto;
+        margin: 3mm;
+    }
 }
-}
+
 .vente-modal {
-    background: rgba(0, 0, 0, 0.5); /* remplace var(--white) qui causait le fond blanc */
+    background: rgba(0, 0, 0, 0.5);
+    /* remplace var(--white) qui causait le fond blanc */
 }
 
 /* La section facture ne dépasse pas sur mobile */

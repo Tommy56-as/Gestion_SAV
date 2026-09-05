@@ -760,11 +760,6 @@ function handleFormSubmit(e) {
     return;
   }
 
-  if (!dateSale) {
-    showNotification("Veuillez sélectionner une date de vente", "error");
-    return;
-  }
-
   // IMPORTANT: Recharger les données actuelles des produits depuis la BD pour vérifier les stocks réels
   // Cela évite les désynchronisations si d'autres utilisateurs ont modifié les stocks
   const url = `${BASE_URL}Controller/produit/get_produits.php`;
@@ -939,7 +934,13 @@ function formatCurrency(value) {
 // Définir la date d'aujourd'hui
 function setDateToday() {
   const today = new Date().toISOString().split("T")[0];
-  document.getElementById("date_vente").value = today;
+  const saleDate = document.getElementById("date_vente");
+  const warrantyDate = document.getElementById("fin_garantie");
+  saleDate.value = today;
+  warrantyDate.min = today;
+  if (warrantyDate.value && warrantyDate.value < today) {
+    warrantyDate.value = "";
+  }
 }
 
 function formatDate(dateString) {
@@ -1260,8 +1261,16 @@ function generatePDF(sale = null, details = null) {
   <div class="facture-wrapper">
     <!-- En-tête boutique -->
     <div class="invoice-header">
-      <div class="shop-name">RAOUL PC SHOP</div>
-      <div class="shop-tel">658688907 / 653770286</div>
+      <div class="shop-name">${escapeHtml(window.APP_COMPANY?.nom || "")}</div>
+      <div class="shop-tel">${escapeHtml(
+        [
+          window.APP_COMPANY?.telephone,
+          window.APP_COMPANY?.adresse,
+          window.APP_COMPANY?.boite_postale,
+        ]
+          .filter(Boolean)
+          .join(" | ")
+      )}</div>
       <div class="facture-label">Facture</div>
       <div class="facture-ref">Réf : ${invoiceRef}</div>
     </div>
@@ -1395,7 +1404,16 @@ function printViewedSale() {
 <html lang="fr"><head><meta charset="utf-8"><title>Facture ${invoiceRef}</title>
 <style>body{font-family:Arial;padding:20px;color:#000}table{width:100%;border-collapse:collapse}th,td{padding:6px;border-bottom:1px solid #eee}thead{background:#1e3a5f;color:#fff}</style>
 </head><body>
-<h2 style="text-align:center">RAOUL PC SHOP</h2>
+<h2 style="text-align:center">${escapeHtml(window.APP_COMPANY?.nom || "")}</h2>
+<p style="text-align:center">${escapeHtml(
+    [
+      window.APP_COMPANY?.telephone,
+      window.APP_COMPANY?.adresse,
+      window.APP_COMPANY?.boite_postale,
+    ]
+      .filter(Boolean)
+      .join(" | ")
+  )}</p>
 <p style="text-align:center">Réf: ${invoiceRef}</p>
 <div><strong>Client:</strong> ${
     vente.client || "-"

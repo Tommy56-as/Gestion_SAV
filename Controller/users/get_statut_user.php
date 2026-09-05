@@ -7,15 +7,26 @@ require_csrf();
 header('Content-Type: application/json');
 // blacage et deblocage d'un utilisateur
 if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['idUser'])) {
-    $idUser = $_POST['idUser'];
-    $new_status = $_POST['Statut']; // attendu: 0 (actif) ou 1 (bloqué)
+    $entrepriseId = require_current_entreprise_id();
+    $idUser = filter_input(INPUT_POST, 'idUser', FILTER_VALIDATE_INT);
+    $new_status = filter_input(INPUT_POST, 'Statut', FILTER_VALIDATE_INT);
+    if (!$idUser || !in_array($new_status, [0, 1], true)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Paramètres invalides']);
+        exit;
+    }
+    if ($idUser === current_user_id()) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Vous ne pouvez pas bloquer votre propre compte']);
+        exit;
+    }
     
     try {
-        $userStatement = $pdo->prepare('SELECT Nom_Utilisateur FROM utilisateur WHERE idUser = ?');
-        $userStatement->execute([$idUser]);
+        $userStatement = $pdo->prepare('SELECT Nom_Utilisateur FROM utilisateur WHERE idEntreprise = ? AND idUser = ?');
+        $userStatement->execute([$entrepriseId, $idUser]);
         $targetUser = $userStatement->fetchColumn() ?: 'Utilisateur #' . $idUser;
-        $stmt = $pdo->prepare("UPDATE utilisateur SET Statut = ? WHERE idUser = ?");
-        $stmt->execute([$new_status, $idUser]);
+        $stmt = $pdo->prepare("UPDATE utilisateur SET Statut = ? WHERE idEntreprise = ? AND idUser = ?");
+        $stmt->execute([$new_status, $entrepriseId, $idUser]);
         $action = ((int) $new_status === 1) ? 'Blocage' : 'Déblocage';
         log_history($pdo, "{$action} de l'utilisateur {$targetUser}");
         

@@ -25,10 +25,11 @@ if (!$idApp || !$idProduit || !$quantite || $quantite < 1 || !$dateApp) {
 }
 
 try {
+    $entrepriseId = require_current_entreprise_id();
     // Le verrou empêche l'édition pendant une réception concurrente.
     $pdo->beginTransaction();
-    $commandeStmt = $pdo->prepare('SELECT statut FROM approvisionnement WHERE idApp = ? FOR UPDATE');
-    $commandeStmt->execute([$idApp]);
+    $commandeStmt = $pdo->prepare('SELECT statut FROM approvisionnement WHERE idEntreprise = ? AND idApp = ? FOR UPDATE');
+    $commandeStmt->execute([$entrepriseId, $idApp]);
     $commande = $commandeStmt->fetch(PDO::FETCH_ASSOC);
     if (!$commande) {
         throw new RuntimeException('Commande introuvable');
@@ -37,8 +38,8 @@ try {
         throw new RuntimeException('Une commande terminée ne peut plus être modifiée');
     }
 
-    $produitStmt = $pdo->prepare('SELECT quantite FROM produit WHERE idproduit = ?');
-    $produitStmt->execute([$idProduit]);
+    $produitStmt = $pdo->prepare('SELECT quantite FROM produit WHERE idEntreprise = ? AND idproduit = ?');
+    $produitStmt->execute([$entrepriseId, $idProduit]);
     $produit = $produitStmt->fetch(PDO::FETCH_ASSOC);
     if (!$produit) {
         throw new RuntimeException('Produit introuvable');
@@ -46,8 +47,8 @@ try {
 
     $updateStmt = $pdo->prepare('UPDATE approvisionnement
         SET idproduit = ?, quantite_stock = ?, quantite_app = ?, prix_total = ?, idfour = ?, date_app = ?
-        WHERE idApp = ?');
-    $updateStmt->execute([$idProduit, (int) $produit['quantite'], $quantite, $prixTotal, $idFour ?: null, $dateApp, $idApp]);
+        WHERE idEntreprise = ? AND idApp = ?');
+    $updateStmt->execute([$idProduit, (int) $produit['quantite'], $quantite, $prixTotal, $idFour ?: null, $dateApp, $entrepriseId, $idApp]);
     $pdo->commit();
     log_history($pdo, "Modification de la commande d'approvisionnement {$idApp}");
     echo json_encode(['success' => true, 'message' => 'Commande modifiée']);

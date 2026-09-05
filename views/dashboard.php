@@ -1,15 +1,21 @@
 <?php
 
 require_once('inc/Database.php');
+$entrepriseId = require_current_entreprise_id();
 $user_id = $_SESSION['user_id']; 
 
 try {
    
     // montant total annuel
-    $sql_total = "SELECT SUM(montant) AS total FROM details_vente";
-    $stmt = $pdo->query($sql_total);
+    $sql_total = "SELECT SUM(d.montant) AS total FROM details_vente d INNER JOIN vente v ON v.idvente = d.idvente WHERE v.idEntreprise = ?";
+    $stmt = $pdo->prepare($sql_total);
+    $stmt->execute([$entrepriseId]);
     $result_total = $stmt->fetch(PDO::FETCH_ASSOC);
     $total = $result_total['total'] ?: 0;
+
+    $stmt = $pdo->prepare("SELECT COALESCE(SUM(d.montant), 0) FROM vente v INNER JOIN details_vente d ON d.idvente = v.idvente WHERE v.idEntreprise = ? AND YEAR(v.date_vente) = YEAR(CURDATE()) AND MONTH(v.date_vente) = MONTH(CURDATE())");
+    $stmt->execute([$entrepriseId]);
+    $total_mois = (float) $stmt->fetchColumn();
 
     // Comparaison annuelle des commandes d'approvisionnement et des ventes.
     $annee_dashboard = filter_input(INPUT_GET, 'annee', FILTER_VALIDATE_INT);
@@ -17,9 +23,9 @@ try {
         ? $annee_dashboard
         : (int)date('Y');
     $stmt = $pdo->prepare("SELECT
-        (SELECT COALESCE(SUM(a.prix_total), 0) FROM approvisionnement a WHERE YEAR(a.date_app) = ? AND statut = 'terminee') AS total_commandes,
-        (SELECT COALESCE(SUM(d.montant), 0) FROM vente v INNER JOIN details_vente d ON d.idvente = v.idvente WHERE YEAR(v.date_vente) = ?) AS total_ventes");
-    $stmt->execute([$annee_dashboard, $annee_dashboard]);
+        (SELECT COALESCE(SUM(a.prix_total), 0) FROM approvisionnement a WHERE a.idEntreprise = ? AND YEAR(a.date_app) = ? AND statut = 'terminee') AS total_commandes,
+        (SELECT COALESCE(SUM(d.montant), 0) FROM vente v INNER JOIN details_vente d ON d.idvente = v.idvente WHERE v.idEntreprise = ? AND YEAR(v.date_vente) = ?) AS total_ventes");
+    $stmt->execute([$entrepriseId, $annee_dashboard, $entrepriseId, $annee_dashboard]);
     $result_annuel = $stmt->fetch(PDO::FETCH_ASSOC);
     $total_commandes_annuel = (float)($result_annuel['total_commandes'] ?? 0);
     $total_ventes_annuel = (float)($result_annuel['total_ventes'] ?? 0);
@@ -31,16 +37,18 @@ try {
     //montant journalier
     $sql_total_jour = "SELECT SUM(d.montant) AS total FROM vente v 
                        JOIN details_vente d ON v.idvente = d.idvente 
-                       WHERE DATE(v.date_vente) = CURDATE()";
-    $stmt = $pdo->query($sql_total_jour);
+                       WHERE v.idEntreprise = ? AND DATE(v.date_vente) = CURDATE()";
+    $stmt = $pdo->prepare($sql_total_jour);
+    $stmt->execute([$entrepriseId]);
     $result_total_jour = $stmt->fetch(PDO::FETCH_ASSOC);
     $total_jour = $result_total_jour['total'] ?: 0;
 
     //utilisateurs actifs/bloques
     $sql_user = "SELECT SUM(CASE WHEN Statut = FALSE THEN 1 ELSE 0 END) AS nb_actifs,
                         SUM(CASE WHEN Statut = TRUE  THEN 1 ELSE 0 END) AS nb_bloques
-                 FROM utilisateur WHERE supprime = 0";
-    $stmt = $pdo->query($sql_user);
+                 FROM utilisateur WHERE idEntreprise = ? AND supprime = 0";
+    $stmt = $pdo->prepare($sql_user);
+    $stmt->execute([$entrepriseId]);
     $result_user = $stmt->fetch(PDO::FETCH_ASSOC);
     $user_actif  = $result_user['nb_actifs'] ?: 0;
     $user_bloque = $result_user['nb_bloques'] ?: 0;
@@ -49,8 +57,9 @@ try {
     $sql_reparation = "SELECT SUM(CASE WHEN statut = 'en_cours' THEN 1 ELSE 0 END) AS en_cours,
                               SUM(CASE WHEN statut = 'en_attente' THEN 1 ELSE 0 END) AS en_attente,
                               SUM(CASE WHEN statut = 'terminee' THEN 1 ELSE 0 END) AS terminee
-                       FROM reparation";
-    $stmt = $pdo->query($sql_reparation);
+                       FROM reparation WHERE idEntreprise = ?";
+    $stmt = $pdo->prepare($sql_reparation);
+    $stmt->execute([$entrepriseId]);
     $result_reparation = $stmt->fetch(PDO::FETCH_ASSOC);
     $en_cours  = $result_reparation['en_cours'] ?: 0;
     $en_attente = $result_reparation['en_attente'] ?: 0;
@@ -60,12 +69,13 @@ try {
 
     // Ventes des 7 derniers jours
     $ventes_7j = [];
-    $stmt = $pdo->query("SELECT DATE(v.date_vente) AS jour, COALESCE(SUM(d.montant), 0) AS total
+    $stmt = $pdo->prepare("SELECT DATE(v.date_vente) AS jour, COALESCE(SUM(d.montant), 0) AS total
                          FROM vente v
                          LEFT JOIN details_vente d ON v.idvente = d.idvente
-                         WHERE v.date_vente >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+                         WHERE v.idEntreprise = ? AND v.date_vente >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
                          GROUP BY DATE(v.date_vente)
                          ORDER BY DATE(v.date_vente)");
+    $stmt->execute([$entrepriseId]);
     $ventes_par_jour = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $ventes_indexees = [];
     foreach ($ventes_par_jour as $vj) {
@@ -82,18 +92,21 @@ try {
     $max_7j = max(array_column($ventes_7j, 'total')) ?: 1;
 
     // Montant total des réparations enregistrées.
-    $stmt = $pdo->query("SELECT COALESCE(SUM(prixTotal), 0) AS total_reparations FROM reparation WHERE statut IN ('terminee')");
+    $stmt = $pdo->prepare("SELECT COALESCE(SUM(prixTotal), 0) AS total_reparations FROM reparation WHERE idEntreprise = ? AND statut IN ('terminee')");
+    $stmt->execute([$entrepriseId]);
     $result_reparations = $stmt->fetch(PDO::FETCH_ASSOC);
     $total_reparations = (float)($result_reparations['total_reparations'] ?? 0);
 
     // Top 5 produits les plus vendus
-    $stmt = $pdo->query("SELECT COALESCE(p.designation) AS designation, COALESCE( p.caracteristique) AS caracteristique, 
+    $stmt = $pdo->prepare("SELECT COALESCE(p.designation) AS designation, COALESCE( p.caracteristique) AS caracteristique, 
                                 SUM(d.quantite) AS qte, SUM(montant) AS montant
                          FROM details_vente d
-                         LEFT JOIN produit p ON d.idproduit = p.idproduit
+                         LEFT JOIN produit p ON d.idproduit = p.idproduit AND p.idEntreprise = ?
+                         INNER JOIN vente v ON v.idvente = d.idvente AND v.idEntreprise = ?
                          GROUP BY designation
                          ORDER BY qte DESC
                          LIMIT 5 ;");
+    $stmt->execute([$entrepriseId, $entrepriseId]);
     $top_produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $max_top = 1;
     foreach ($top_produits as $tp) { $max_top = max($max_top, (int)$tp['qte']); }
@@ -101,33 +114,37 @@ try {
     /* ===== ALERTES & PERSPECTIVES (FUTUR) ===== */
 
     // Alertes de stock (quantité <= quantité minimale)
-    $stmt = $pdo->query("SELECT designation, caracteristique, CAST(quantite AS UNSIGNED) AS qte, CAST(quantite_min AS UNSIGNED) AS qte_min, prixUnitaire
+    $stmt = $pdo->prepare("SELECT designation, caracteristique, CAST(quantite AS UNSIGNED) AS qte, CAST(quantite_min AS UNSIGNED) AS qte_min, prixUnitaire
                          FROM produit 
-                         WHERE CAST(quantite AS UNSIGNED) <= CAST(quantite_min AS UNSIGNED)
+                         WHERE idEntreprise = ? AND CAST(quantite AS UNSIGNED) <= CAST(quantite_min AS UNSIGNED)
                          ORDER BY CAST(quantite AS UNSIGNED) ASC");
+    $stmt->execute([$entrepriseId]);
     $alertes_stock = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Garanties à venir dans les 30 prochains jours
-    $stmt = $pdo->query("SELECT COALESCE(p.designation) AS designation, v.client, v.telephone, d.finGarantie
-                         FROM details_vente d INNER JOIN produit p ON d.idvente = p.idproduit
+    $stmt = $pdo->prepare("SELECT COALESCE(p.designation) AS designation, v.client, v.telephone, d.finGarantie
+                         FROM details_vente d INNER JOIN produit p ON d.idproduit = p.idproduit AND p.idEntreprise = ?
                          INNER JOIN vente v ON v.idvente = d.idvente
-                         WHERE d.finGarantie IS NOT NULL
+                         WHERE v.idEntreprise = ? AND d.finGarantie IS NOT NULL
                          AND d.finGarantie BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
                          ORDER BY d.finGarantie ASC
                          LIMIT 6 ;");
+    $stmt->execute([$entrepriseId, $entrepriseId]);
     $garanties_30j = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Réparations en attente (détail)
-    $stmt = $pdo->query("SELECT idrep, nomClient, appareil, telephone, statut
+    $stmt = $pdo->prepare("SELECT idrep, nomClient, appareil, telephone, statut
                          FROM reparation
-                         WHERE statut = 'en_attente'
+                         WHERE idEntreprise = ? AND statut = 'en_attente'
                          ORDER BY idrep DESC
                          LIMIT 6 ");
+    $stmt->execute([$entrepriseId]);
     $reparations_attente = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 } catch(PDOException $e) {
     echo ("Erreur: " . $e->getMessage());
     $total = 0;
+    $total_mois = 0;
     $total_jour = 0;
     $annee_dashboard = (int)date('Y');
     $total_commandes_annuel = 0;
@@ -158,7 +175,7 @@ $date_fr = $jours_fr[(int)$date_aujourdhui->format('w')] . ' ' . $date_aujourdhu
 <div class="dash-header">
     <div class="dash-header-left">
         <h1 class="main-title dash-title"><span class="material-icons-sharp">bar_chart</span> Tableau de bord</h1>
-        <p class="dash-subtitle">Vue d'ensemble de votre activité en temps réel</p>
+        <p class="dash-subtitle">Les chiffres importants de votre activité, expliqués simplement.</p>
     </div>
     <header class="header-right">
         <span class="dash-date-badge">
@@ -176,9 +193,9 @@ $date_fr = $jours_fr[(int)$date_aujourdhui->format('w')] . ' ' . $date_aujourdhu
     <div class="dash-hero-content">
         <span class="dash-hero-badge">
             <span class="material-icons-sharp">trending_up</span>
-            Chiffre d'affaires global
+            Ventes cumulées
         </span>
-        <p class="dash-hero-title">Total des ventes générées</p>
+        <p class="dash-hero-title">Tout ce que votre entreprise a vendu</p>
         <div class="dash-hero-amount"><?= number_format($total, 0, ',', ' ') ?> <small>FCFA</small></div>
         <p class="dash-hero-note">
             <span class="material-icons-sharp">savings</span>
@@ -222,6 +239,18 @@ $date_fr = $jours_fr[(int)$date_aujourdhui->format('w')] . ' ' . $date_aujourdhu
         </div>
     </div>
 
+    <div class="dash-card dash-animate accent-success">
+        <div class="dash-card-top">
+            <span class="dash-card-icon material-icons-sharp">calendar_month</span>
+            <span class="dash-card-label">Ventes du mois</span>
+        </div>
+        <div class="dash-card-value"><?= number_format($total_mois, 0, ',', ' ') ?> <small>FCFA</small></div>
+        <div class="dash-card-footer">
+            <span class="dash-card-trend"><span class="material-icons-sharp">payments</span> Depuis le 1er</span>
+            <span class="dash-card-sub">Mois en cours</span>
+        </div>
+    </div>
+
     <div class="dash-card dash-animate accent-success dash-annual-card">
         <div class="dash-card-top">
             <span class="dash-card-icon material-icons-sharp">compare_arrows</span>
@@ -248,7 +277,8 @@ $date_fr = $jours_fr[(int)$date_aujourdhui->format('w')] . ' ' . $date_aujourdhu
                 <span class="material-icons-sharp"><?= $ecart_annuel >= 0 ? 'trending_up' : 'trending_down' ?></span>
                 Écart <?= $ecart_annuel >= 0 ? '+' : '' ?><?= number_format($ecart_annuel, 0, ',', ' ') ?> FCFA
             </span>
-            <span class="dash-card-sub"><?= number_format($taux_couverture_annuel, 1, ',', ' ') ?>% couverture</span>
+            <span class="dash-card-sub"><?= number_format($taux_couverture_annuel, 1, ',', ' ') ?>% ventes /
+                achats</span>
         </div>
     </div>
 
@@ -329,7 +359,7 @@ $date_fr = $jours_fr[(int)$date_aujourdhui->format('w')] . ' ' . $date_aujourdhu
 </div>
 
 <!-- ============================================================
-     ANALYSE DES PERFORMANCES (ACTIVITÉS PASSÉES)
+    CE QUI S'EST PASSÉ
 ============================================================ -->
 <div class="dash-analytics dash-animate">
 
@@ -418,7 +448,7 @@ $date_fr = $jours_fr[(int)$date_aujourdhui->format('w')] . ' ' . $date_aujourdhu
 </div>
 
 <!-- ============================================================
-     ALERTES & PERSPECTIVES (ACTIVITÉS FUTURES)
+    À SURVEILLER
 ============================================================ -->
 <div class="dash-analytics dash-animate">
 

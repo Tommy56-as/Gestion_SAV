@@ -7,8 +7,9 @@ if(isset($_GET['idproduit'])) {
     $idProduit = intval($_GET['idproduit']);
     
     try {
-        $stmt = $pdo->prepare("SELECT * FROM produit WHERE idproduit = ?");
-        $stmt->execute([$idProduit]);
+        $entrepriseId = require_current_entreprise_id();
+        $stmt = $pdo->prepare("SELECT * FROM produit WHERE idEntreprise = ? AND idproduit = ?");
+        $stmt->execute([$entrepriseId, $idProduit]);
         $produit = $stmt->fetch(PDO::FETCH_ASSOC);
         
         if($produit) {

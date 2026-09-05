@@ -12,8 +12,9 @@ if (!isset($_GET['id'])) {
 
 $id = (int) $_GET['id'];
 
-$stmt = $pdo->prepare("SELECT * FROM utilisateur WHERE idUser = ?");
-$stmt->execute([$id]);
+$entrepriseId = require_current_entreprise_id();
+$stmt = $pdo->prepare("SELECT * FROM utilisateur WHERE idEntreprise = ? AND idUser = ?");
+$stmt->execute([$entrepriseId, $id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$user) {

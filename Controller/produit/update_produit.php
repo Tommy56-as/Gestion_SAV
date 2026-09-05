@@ -9,6 +9,7 @@ header('Content-Type: application/json');
 
 // mise à jour d'un produit
 if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['idproduit'])) { 
+    $entrepriseId = require_current_entreprise_id();
     // Validation des champs requis
     $required_fields = ['designation', 'caracteristique', 'quantite', 'quantite_min', 'prixUnitaire', 'categorie'];
         foreach ($required_fields as $field) {
@@ -20,10 +21,12 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['idproduit'])) {
     $designation = $_POST['designation'];
     $caracteristique = $_POST['caracteristique'];
     $quantite = $_POST['quantite'];
+    $categorie = trim($_POST['categorie']);
     
     try {
-        $stmt = $pdo->prepare("UPDATE produit SET designation = ?, caracteristique = ?, quantite = ? WHERE idproduit = ?");
-        $stmt->execute([$designation, $caracteristique, $quantite, $idproduit]);
+        $categorieId = get_or_create_category($pdo, $entrepriseId, $categorie);
+        $stmt = $pdo->prepare("UPDATE produit SET idCategorie = ?, categorie = ?, designation = ?, caracteristique = ?, quantite = ? WHERE idEntreprise = ? AND idproduit = ?");
+        $stmt->execute([$categorieId, $categorie, $designation, $caracteristique, $quantite, $entrepriseId, $idproduit]);
         log_history($pdo, "Modification du produit {$designation} ({$caracteristique})");
         
         // Gestion de l'image si fournie
@@ -40,8 +43,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['idproduit'])) {
                 throw new Exception('Erreur lors du téléchargement de l\'image');
             }
             
-            $stmt = $pdo->prepare("UPDATE produit SET image = ? WHERE idproduit = ?");
-            $stmt->execute([$imageName, $idproduit]);
+            $stmt = $pdo->prepare("UPDATE produit SET image = ? WHERE idEntreprise = ? AND idproduit = ?");
+            $stmt->execute([$imageName, $entrepriseId, $idproduit]);
         }
         
         echo json_encode(['success' => true, 'message' => 'Produit mis à jour avec succès']);

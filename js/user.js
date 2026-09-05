@@ -29,6 +29,15 @@ function loadUsers() {
       data.users.forEach((user) => {
         const status = user.Statut ?? 0;
         const userId = user.idUser ?? 0;
+        const isCurrentUser = userId == Number(container.dataset.currentUserId);
+        const accountActions = isCurrentUser
+          ? ""
+          : status == 1
+          ? `<button class="btn btn-success btn-sm" onclick="debloquerUser(${userId})"><span class="material-icons-sharp">lock_open</span></button>`
+          : `<button class="btn btn-danger btn-sm" onclick="bloquerUser(${userId})"><span class="material-icons-sharp">lock</span></button>`;
+        const deleteAction = isCurrentUser
+          ? ""
+          : `<button type="button" class="btn btn-delete btn-sm" data-delete-user="${userId}" aria-label="Supprimer l'utilisateur"><span class="material-icons-sharp">delete</span></button>`;
 
         container.innerHTML += `
                     <div class="user-card ${
@@ -80,18 +89,8 @@ function loadUsers() {
                                 <span class="material-icons-sharp">edit</span>
                             </button>
 
-                            ${
-                              status == 1
-                                ? `<button class="btn btn-success btn-sm" onclick="debloquerUser(${userId})">
-                                        <span class="material-icons-sharp">lock_open</span>
-                                   </button>`
-                                : `<button class="btn btn-danger btn-sm" onclick="bloquerUser(${userId})">
-                                        <span class="material-icons-sharp">lock</span>
-                                   </button>`
-                            }
-                            <button type="button" class="btn btn-delete btn-sm" data-delete-user="${userId}" aria-label="Supprimer l'utilisateur">
-                                <span class="material-icons-sharp">delete</span>
-                            </button>
+                            ${accountActions}
+                            ${deleteAction}
                         </div>
                     </div>
                 `;

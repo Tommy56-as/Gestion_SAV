@@ -19,7 +19,7 @@ async function loadApprovisionnementData() {
     await Promise.all([
       fetch(`${approvisionnementBaseUrl}Controller/produit/get_produits.php`),
       fetch(
-        `${approvisionnementBaseUrl}Controller/fournisseur/getAllFournisseur.php`
+        `${approvisionnementBaseUrl}Controller/fournisseur/getAllFournisseur.php?actifs=1`
       ),
       fetch(
         `${approvisionnementBaseUrl}Controller/approvisionnemeent/get_approvisionnements.php`
@@ -75,22 +75,20 @@ function renderCommandes() {
     .getElementById("rechercheCommande")
     .value.trim()
     .toLowerCase();
-  const commandes = approvisionnementState.commandes.filter(
-    (commande) => {
-      const contenu = [
-        commande.produit,
-        commande.fournisseur,
-        commande.date_app,
-        commande.statut,
-      ]
-        .join(" ")
-        .toLowerCase();
-      return (
-        (!filtre || commande.statut === filtre) &&
-        (!recherche || contenu.includes(recherche))
-      );
-    }
-  );
+  const commandes = approvisionnementState.commandes.filter((commande) => {
+    const contenu = [
+      commande.produit,
+      commande.fournisseur,
+      commande.date_app,
+      commande.statut,
+    ]
+      .join(" ")
+      .toLowerCase();
+    return (
+      (!filtre || commande.statut === filtre) &&
+      (!recherche || contenu.includes(recherche))
+    );
+  });
   const body = document.getElementById("commandesBody");
   if (!commandes.length) {
     body.innerHTML =

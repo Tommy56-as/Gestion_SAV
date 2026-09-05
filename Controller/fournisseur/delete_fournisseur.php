@@ -8,6 +8,7 @@ require_csrf();
 header('Content-Type: application/json');
 
 $fournisseurId = filter_input(INPUT_POST, 'idfour', FILTER_VALIDATE_INT);
+$entrepriseId = require_current_entreprise_id();
 if (!$fournisseurId) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Fournisseur invalide']);
@@ -15,10 +16,10 @@ if (!$fournisseurId) {
 }
 
 try {
-    $statement = $pdo->prepare("SELECT nom, prenom FROM fournisseur WHERE idfour = ? AND supprime = 0");
-    $statement->execute([$fournisseurId]);
+    $statement = $pdo->prepare("SELECT nom, prenom FROM fournisseur WHERE idEntreprise = ? AND idfour = ? AND supprime = 0");
+    $statement->execute([$entrepriseId, $fournisseurId]);
     $supplier = $statement->fetch(PDO::FETCH_ASSOC);
-    if (!$supplier || !soft_delete($pdo, 'fournisseur', $fournisseurId)) {
+    if (!$supplier || !soft_delete($pdo, 'fournisseur', $fournisseurId, $entrepriseId)) {
         http_response_code(404);
         echo json_encode(['success' => false, 'message' => 'Fournisseur introuvable']);
         exit;

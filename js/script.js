@@ -130,6 +130,25 @@ document.addEventListener("DOMContentLoaded", function () {
       localStorage.removeItem("appPreferences");
       window.location.reload();
     });
+
+  const companyForm = document.querySelector("#companyForm");
+  if (companyForm) {
+    companyForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      const message = document.querySelector("#companyMessage");
+      const response = await fetch("Controller/entreprise/update.php", {
+        method: "POST",
+        body: new FormData(companyForm),
+      });
+      const result = await response.json();
+      message.textContent = result.message || "Opération terminée";
+      message.className = `category-message ${
+        result.success ? "success" : "error"
+      }`;
+      if (result.success)
+        window.APP_COMPANY = Object.fromEntries(new FormData(companyForm));
+    });
+  }
 });
 
 function showNotification(message, type = "success") {

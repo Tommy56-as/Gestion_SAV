@@ -1,11 +1,13 @@
 <?php
 require_once('inc/DataBase.php');
+$entrepriseId = require_current_entreprise_id();
 
 /* ============================================================
    ANALYSE DES VENTES - Récupération des données réelles
 ============================================================ */
 $mois_fr = ['','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 $annee_courante = date('Y');
+$labels_semaine = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
 try {
     // --- Ventes mensuelles de l'année courante ---
@@ -13,10 +15,10 @@ try {
     $stmt = $pdo->prepare("SELECT MONTH(v.date_vente) AS mois, COALESCE(SUM(d.montant),0) AS total
                            FROM vente v
                            LEFT JOIN details_vente d ON v.idvente = d.idvente
-                           WHERE YEAR(v.date_vente) = :annee
+                           WHERE v.idEntreprise = :entreprise AND YEAR(v.date_vente) = :annee
                            GROUP BY MONTH(v.date_vente)
                            ORDER BY MONTH(v.date_vente)");
-    $stmt->execute(['annee' => $annee_courante]);
+    $stmt->execute(['entreprise' => $entrepriseId, 'annee' => $annee_courante]);
     foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         $ventes_mensuelles[(int)$row['mois']] = (float)$row['total'];
     }
@@ -33,27 +35,38 @@ try {
     $moyenne_mensuelle = $nb_mois_avec_ventes > 0 ? $total_annuel / $nb_mois_avec_ventes : 0;
 
     // --- Nombre de produits ---
-    $nb_produits = (int)$pdo->query("SELECT COUNT(*) FROM produit")->fetchColumn();
+    $countStatement = $pdo->prepare("SELECT COUNT(*) FROM produit WHERE idEntreprise = ?");
+    $countStatement->execute([$entrepriseId]);
+    $nb_produits = (int)$countStatement->fetchColumn();
 
     // --- Nombre de réparations ---
-    $nb_reparations = (int)$pdo->query("SELECT COUNT(*) FROM reparation")->fetchColumn();
+    $countStatement = $pdo->prepare("SELECT COUNT(*) FROM reparation WHERE idEntreprise = ?");
+    $countStatement->execute([$entrepriseId]);
+    $nb_reparations = (int)$countStatement->fetchColumn();
 
     // --- Nombre de clients (ventes distinctes) ---
-    $nb_clients = (int)$pdo->query("SELECT COUNT(DISTINCT client) FROM vente")->fetchColumn();
+    $countStatement = $pdo->prepare("SELECT COUNT(DISTINCT client) FROM vente WHERE idEntreprise = ?");
+    $countStatement->execute([$entrepriseId]);
+    $nb_clients = (int)$countStatement->fetchColumn();
 
     // --- Top 5 produits les plus vendus ---
-    $top_produits = $pdo->query("SELECT COALESCE(p.designation) AS designation,
+    $topStatement = $pdo->prepare("SELECT COALESCE(p.designation) AS designation,
                                         COALESCE(p.caracteristique) AS caracteristique,
                                         SUM(d.quantite) AS qte,
                                         SUM(d.montant) AS montant
                                  FROM details_vente d INNER JOIN produit p
-                                 WHERE d.idproduit = p.idproduit
+                                 INNER JOIN vente v ON v.idvente = d.idvente
+                                 WHERE d.idproduit = p.idproduit AND v.idEntreprise = ? AND p.idEntreprise = ?
                                  GROUP BY p.designation, p.caracteristique
                                  ORDER BY qte DESC
-                                 LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
+                                 LIMIT 5");
+    $topStatement->execute([$entrepriseId, $entrepriseId]);
+    $top_produits = $topStatement->fetchAll(PDO::FETCH_ASSOC);
 
     // --- Réparations par statut ---
-    $repa_statut = $pdo->query("SELECT statut, COUNT(*) AS nb FROM reparation GROUP BY statut")->fetchAll(PDO::FETCH_ASSOC);
+    $repaStatement = $pdo->prepare("SELECT statut, COUNT(*) AS nb FROM reparation WHERE idEntreprise = ? GROUP BY statut");
+    $repaStatement->execute([$entrepriseId]);
+    $repa_statut = $repaStatement->fetchAll(PDO::FETCH_ASSOC);
     $map_statut = [];
     foreach ($repa_statut as $rs) { $map_statut[$rs['statut']] = (int)$rs['nb']; }
     $nb_repa_attente  = $map_statut['en_attente'] ?? 0;
@@ -62,12 +75,13 @@ try {
 
     /* ===== VENTES DES 7 DERNIERS JOURS (comparaison hebdomadaire) ===== */
     $ventes_7j = [];
-    $stmt = $pdo->query("SELECT DATE(v.date_vente) AS jour, COALESCE(SUM(d.montant), 0) AS total
+    $stmt = $pdo->prepare("SELECT DATE(v.date_vente) AS jour, COALESCE(SUM(d.montant), 0) AS total
                          FROM vente v
                          LEFT JOIN details_vente d ON v.idvente = d.idvente
-                         WHERE v.date_vente >= DATE_SUB(CURDATE(), INTERVAL 13 DAY)
+                         WHERE v.idEntreprise = ? AND v.date_vente >= DATE_SUB(CURDATE(), INTERVAL 13 DAY)
                          GROUP BY DATE(v.date_vente)
                          ORDER BY DATE(v.date_vente)");
+    $stmt->execute([$entrepriseId]);
     $ventes_par_jour = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $ventes_indexees = [];
     foreach ($ventes_par_jour as $vj) {
@@ -85,7 +99,6 @@ try {
             $semaine_courante[] = $val;
         }
     }
-    $labels_semaine = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
     $total_semaine_courante = array_sum($semaine_courante);
     $total_semaine_precedente = array_sum($semaine_precedente);
     $evolution_semaine = $total_semaine_precedente > 0 ? round((($total_semaine_courante - $total_semaine_precedente) / $total_semaine_precedente) * 100) : 0;
@@ -104,6 +117,7 @@ try {
     $nb_repa_terminee = 0;
     $semaine_courante = [0,0,0,0,0,0,0];
     $semaine_precedente = [0,0,0,0,0,0,0];
+    $labels_semaine = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
     $total_semaine_courante = 0;
     $total_semaine_precedente = 0;
     $evolution_semaine = 0;

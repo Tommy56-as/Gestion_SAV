@@ -1,6 +1,7 @@
 <?php
 
 require_once('inc/Database.php');
+require_once('inc/saas.php');
 $user_id = $_SESSION['user_id']; // Assurez-vous que l'utilisateur est connecté
 
 try {
@@ -32,6 +33,9 @@ function is_active($page) {
 }
 
 $isAdmin = ($_SESSION['user_type'] ?? '') === 'Administrateur';
+$hasFeature = static function (string $feature): bool {
+    return entreprise_feature_enabled($feature);
+};
 
 ?>
 <div class="main-sidebar">
@@ -62,40 +66,39 @@ $isAdmin = ($_SESSION['user_type'] ?? '') === 'Administrateur';
                     <span>Tableau de bord</span>
                 </a>
             </li>
-
-            <li class="item">
+            </li>
+            <?php if ($hasFeature('produits')): ?><li class="item">
                 <a href="home.php?page=produits" <?= is_active('produits') ?>>
                     <span class="material-icons-sharp">add_shopping_cart</span>
                     <span>Ajouter produit</span>
                 </a>
-            </li>
-            <li class="item">
+            </li><?php endif; ?>
+            <?php if ($hasFeature('ventes')): ?><li class="item">
                 <a href="home.php?page=ventes" <?= is_active('ventes') ?>>
                     <span class="material-icons-sharp">shopping_cart_checkout</span>
                     <span>Ventes</span>
                 </a>
-            </li>
-            <?php if ($isAdmin): ?>
-            <li class="item">
+            </li><?php endif; ?>
+            <?php if ($hasFeature('fournisseurs') && $isAdmin): ?><li class="item">
                 <a href="home.php?page=fournisseurs" <?= is_active('fournisseurs') ?>>
                     <span class="material-icons-sharp">groups</span>
                     <span>Fournisseurs</span>
                 </a>
             </li>
             <?php endif; ?>
-            <li class="item">
+            <?php if ($hasFeature('commandes')): ?><li class="item">
                 <a href="home.php?page=commandes" <?= is_active('commandes') ?>>
                     <span class="material-icons-sharp">local_offer</span>
                     <span>Commandes</span>
                 </a>
-            </li>
-            <li class="item">
+            </li><?php endif; ?>
+            <?php if ($hasFeature('reparations')): ?><li class="item">
                 <a href="home.php?page=reparations" <?= is_active('reparations') ?>>
                     <span class="material-icons-sharp">build</span>
                     <span>Réparations</span>
                 </a>
-            </li>
-            <?php if ($isAdmin): ?>
+            </li><?php endif; ?>
+            <?php if ($isAdmin && $hasFeature('utilisateurs')): ?>
             <li class="item">
                 <a href="home.php?page=utilisateurs" <?= is_active('utilisateurs') ?>>
                     <span class="material-icons-sharp">person_add_alt</span>
@@ -103,7 +106,7 @@ $isAdmin = ($_SESSION['user_type'] ?? '') === 'Administrateur';
                 </a>
             </li>
             <?php endif; ?>
-            <?php if ($isAdmin): ?>
+            <?php if ($isAdmin && $hasFeature('historiques')): ?>
             <li class="item">
                 <a href="home.php?page=historiques" <?= is_active('historiques') ?>>
                     <span class="material-icons-sharp">history</span>
@@ -111,7 +114,7 @@ $isAdmin = ($_SESSION['user_type'] ?? '') === 'Administrateur';
                 </a>
             </li>
             <?php endif; ?>
-            <?php if ($isAdmin): ?>
+            <?php if ($isAdmin && $hasFeature('statistiques')): ?>
             <li class="item">
                 <a href="home.php?page=Statistiques" <?= is_active('Statistiques') ?>>
                     <span class="material-icons-sharp">bar_chart</span>
@@ -119,26 +122,30 @@ $isAdmin = ($_SESSION['user_type'] ?? '') === 'Administrateur';
                 </a>
             </li>
             <?php endif; ?>
-            <li class="item">
+            <?php if ($hasFeature('parametres')): ?><li class="item">
                 <a href="home.php?page=parametres" <?= is_active('parametres') ?>>
                     <span class="material-icons-sharp">settings</span>
                     <span>Paramètres</span>
                 </a>
-            </li>
-            <?php if (($_SESSION['user_type'] ?? '') === 'Administrateur'): ?>
-            <li class="item">
+            </li><?php endif; ?>
+            <?php if ($isAdmin): ?><li class="item">
+                <a href="home.php?page=abonnement" <?= is_active('abonnement') ?>>
+                    <span class="material-icons-sharp">workspace_premium</span>
+                    <span>Abonnement</span>
+                </a>
+            </li><?php endif; ?>
+            <?php if ($isAdmin && $hasFeature('autorisations')): ?><li class="item">
                 <a href="home.php?page=autorisations" <?= is_active('autorisations') ?>>
                     <span class="material-icons-sharp">admin_panel_settings</span>
                     <span>Autorisations</span>
                 </a>
-            </li>
-            <li class="item">
+            </li><?php endif; ?>
+            <?php if ($isAdmin && $hasFeature('sessions')): ?><li class="item">
                 <a href="home.php?page=sessions" <?= is_active('sessions') ?>>
                     <span class="material-icons-sharp">monitor_heart</span>
                     <span>Sessions</span>
                 </a>
-            </li>
-            <?php endif; ?>
+            </li><?php endif; ?>
             <li class="item">
                 <a href="logout.php">
                     <span class="material-icons-sharp">logout</span>
@@ -149,4 +156,3 @@ $isAdmin = ($_SESSION['user_type'] ?? '') === 'Administrateur';
     </div>
 </div>
 <script src="js/script.js"></script>
-<!-- End Sidebar -->

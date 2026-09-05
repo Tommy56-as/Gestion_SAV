@@ -63,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         
                         // Stocker les informations utilisateur
                         $_SESSION['user_id'] = $user['idUser'];
+                        $_SESSION['entreprise_id'] = (int) ($user['idEntreprise'] ?? 0);
                         $_SESSION['user_email'] = $user['Email'];
                         $_SESSION['user_nom'] = $user['Nom_Utilisateur'] ?? 'Utilisateur';
                         $_SESSION['user_type'] = $typeCompte;

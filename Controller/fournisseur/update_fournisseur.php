@@ -8,6 +8,7 @@ require_csrf();
 require_once '../../inc/Database.php';
 require_once '../../inc/history.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['idfour'])) {
+    $entrepriseId = require_current_entreprise_id();
     // Validation des champs requis
     $required_fields = [ 'nom',  'prenom', 'telephone','adresse', 'produitLivre'];
     foreach($required_fields as $field) {
@@ -33,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['idfour'])) {
             adresse = :adresse,
             produit_livre = :produit,
             statut = :statut
-            WHERE idfour = :idfour
+            WHERE idEntreprise = :entreprise AND idfour = :idfour
         ");
 
         $stmt->execute([
@@ -43,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['idfour'])) {
             ':adresse' => $adresse,
             ':produit' => $produitLivre,
             ':statut' => $statut,
+            ':entreprise' => $entrepriseId,
             ':idfour' => $idfour
         ]);
         log_history($pdo, "Modification du fournisseur {$nom} {$prenom}");

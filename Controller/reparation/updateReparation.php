@@ -23,8 +23,9 @@ if (!$idrep || !in_array($statut, ['en_attente', 'en_cours', 'terminee'], true))
 
 try {
     $pdo->beginTransaction();
-    $statement = $pdo->prepare('SELECT nomClient, telephone, email, appareil, prixTotal, statut, message_envoye FROM reparation WHERE idrep = ? FOR UPDATE');
-    $statement->execute([$idrep]);
+    $entrepriseId = require_current_entreprise_id();
+    $statement = $pdo->prepare('SELECT nomClient, telephone, email, appareil, prixTotal, statut, message_envoye FROM reparation WHERE idEntreprise = ? AND idrep = ? FOR UPDATE');
+    $statement->execute([$entrepriseId, $idrep]);
     $repair = $statement->fetch(PDO::FETCH_ASSOC);
     if (!$repair) {
         throw new RuntimeException('Réparation introuvable');
@@ -33,13 +34,13 @@ try {
         throw new RuntimeException('Une réparation terminée ne peut plus être réouverte');
     }
 
-    $update = $pdo->prepare('UPDATE reparation SET statut = ?, diagnostic = ?, solution = ? WHERE idrep = ?');
-    $update->execute([$statut, $diagnostic ?: null, $solution ?: null, $idrep]);
+    $update = $pdo->prepare('UPDATE reparation SET statut = ?, diagnostic = ?, solution = ? WHERE idEntreprise = ? AND idrep = ?');
+    $update->execute([$statut, $diagnostic ?: null, $solution ?: null, $entrepriseId, $idrep]);
     $notification = null;
     if ($statut === 'terminee' && !$repair['message_envoye']) {
         $message = "Bonjour {$repair['nomClient']}, votre appareil ({$repair['appareil']}) est réparé. Vous pouvez passer le récupérer. Montant à payer : {$repair['prixTotal']} FCFA.";
-        $messageUpdate = $pdo->prepare('UPDATE reparation SET message_envoye = 1, message_envoye_at = NOW() WHERE idrep = ?');
-        $messageUpdate->execute([$idrep]);
+        $messageUpdate = $pdo->prepare('UPDATE reparation SET message_envoye = 1, message_envoye_at = NOW() WHERE idEntreprise = ? AND idrep = ?');
+        $messageUpdate->execute([$entrepriseId, $idrep]);
         $notification = ['telephone' => $repair['telephone'], 'email' => $repair['email'], 'message' => $message];
     }
     $pdo->commit();

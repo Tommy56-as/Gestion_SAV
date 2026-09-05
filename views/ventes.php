@@ -70,12 +70,12 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="date_vente">Date de Vente *</label>
-                                    <input type="date" id="date_vente" name="date_vente" required>
+                                    <label for="date_vente">Date de Vente</label>
+                                    <input type="date" id="date_vente" name="date_vente" disabled aria-disabled="true">
                                 </div>
                                 <div class="form-group">
                                     <label for="fin_garantie">Fin de Garantie</label>
-                                    <input type="date" id="fin_garantie" name="fin_garantie">
+                                    <input type="date" id="fin_garantie" name="fin_garantie" min="">
                                 </div>
                             </div>
                         </form>
@@ -196,8 +196,8 @@
                 <!-- Section Facture -->
                 <div class="invoice-section">
                     <div class="invoice-header">
-                        <h2>RAOUL PC SHOP</h2>
-                        <h4>658688907 / 653770286</h4>
+                        <h2><?= htmlspecialchars($currentEntreprise['nom'] ?? '', ENT_QUOTES, 'UTF-8') ?></h2>
+                        <h4><?= htmlspecialchars($currentEntreprise['telephone'] ?? '', ENT_QUOTES, 'UTF-8') ?></h4>
                         <h3>FACTURE</h3>
                         <p>Réf: <span id="invoiceRef">EN ATTENTE</span></p>
                     </div>
@@ -343,9 +343,9 @@
                         </table>
                         <div class="pagination-container" id="detailsPagination"></div>
                         <div style="text-align: center; margin-top: 10px;" class="no-print">
-                            <!-- <button type="button" class="btn btn-print" onclick="printViewedSale()">
+                            <!--<button type="button" class="btn btn-print" onclick="printViewedSale()">
                                 <span class="material-icons-sharp">print</span> Imprimer la Facture
-                                </button> -->
+                            </button> -->
                         </div>
                     </div>
                 </div>

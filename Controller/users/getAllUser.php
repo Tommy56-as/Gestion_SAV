@@ -5,7 +5,9 @@ require_once '../../inc/Database.php';
 require_admin();
 // affihage de tous les utilisateurs
 try {
-    $stmt = $pdo->query("SELECT * FROM utilisateur WHERE supprime = 0");
+    $entrepriseId = require_current_entreprise_id();
+    $stmt = $pdo->prepare("SELECT * FROM utilisateur WHERE idEntreprise = ? AND supprime = 0");
+    $stmt->execute([$entrepriseId]);
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     echo json_encode(['success' => true, 'users' => $users]);

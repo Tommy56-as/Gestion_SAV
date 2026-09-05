@@ -5,7 +5,9 @@ header('Content-Type: application/json');
 
 //affichage de tous les produits
 try {   
-    $stmt = $pdo->query("SELECT * FROM produit");
+    $entrepriseId = require_current_entreprise_id();
+    $stmt = $pdo->prepare("SELECT * FROM produit WHERE idEntreprise = ?");
+    $stmt->execute([$entrepriseId]);
     $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     echo json_encode(['success' => true, 'data' => $produits]);

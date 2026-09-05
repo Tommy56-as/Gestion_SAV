@@ -3,6 +3,7 @@ require_once __DIR__ . '/../inc/bootstrap.php';
 require_once __DIR__ . '/../inc/Database.php';
 require_once __DIR__ . '/../inc/history.php';
 require_once __DIR__ . '/../inc/authorization.php';
+require_once __DIR__ . '/../inc/saas.php';
 
 // Vérifier si un utilisateur est connecté. Les permissions sont vérifiées par action.
 if (!is_authenticated() || !isset($_SESSION['user_email'])) {

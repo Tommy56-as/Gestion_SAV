@@ -7,6 +7,7 @@ require_csrf();
 header('Content-Type: application/json');
 
 if($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $entrepriseId = require_current_entreprise_id();
     // Validation des champs requis
     $required_fields = ['Nom_Utilisateur', 'Email', 'TypeDeCompte', 'MotDePasse', 'NomComplet', 'Telephone', 'Adresse'];
     foreach($required_fields as $field) {
@@ -50,9 +51,9 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
-        $stmt = $pdo->prepare("INSERT INTO utilisateur (Nom_Utilisateur, Email, TypeDeCompte, MotDePasse, NomComplet, Telephone, Adresse, Statut) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$username, $email, $account_type, $hashed_password, $full_name, $phone, $address, $status]);
+        $stmt = $pdo->prepare("INSERT INTO utilisateur (idEntreprise, Nom_Utilisateur, Email, TypeDeCompte, MotDePasse, NomComplet, Telephone, Adresse, Statut) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$entrepriseId, $username, $email, $account_type, $hashed_password, $full_name, $phone, $address, $status]);
         log_history($pdo, "Ajout de l'utilisateur {$username} ({$email})");
         
         echo json_encode([

@@ -85,10 +85,10 @@ function loadFournisseurs() {
 
                             ${
                               status == 1
-                                ? `<button class="btn btn-success btn-sm" onclick="debloquerUser(${fournisseurId})">
+                                ? `<button class="btn btn-success btn-sm" onclick="restaurerFournisseur(${fournisseurId})">
                                         <span class="material-icons-sharp">lock_open</span>
                                    </button>`
-                                : `<button class="btn btn-danger btn-sm" onclick="bloquerUser(${fournisseurId})">
+                                : `<button class="btn btn-danger btn-sm" onclick="archiverFournisseur(${fournisseurId})">
                                         <span class="material-icons-sharp">lock</span>
                                    </button>`
                             }
@@ -316,16 +316,58 @@ function resetForm() {
 }
 
 function deleteFournisseur(fournisseurId) {
-  if (!confirm("Voulez-vous supprimer ce fournisseur ? Il sera masqué mais conservé dans l'historique.")) return;
+  if (
+    !confirm(
+      "Voulez-vous supprimer ce fournisseur ? Il sera masqué mais conservé dans l'historique."
+    )
+  )
+    return;
   const formData = new FormData();
   formData.append("idfour", fournisseurId);
   fetch(getApiUrl("delete_fournisseur.php"), { method: "POST", body: formData })
     .then((response) => response.json())
     .then((data) => {
-      showNotification(data.message || "Opération terminée", data.success ? "success" : "error");
+      showNotification(
+        data.message || "Opération terminée",
+        data.success ? "success" : "error"
+      );
       if (data.success) loadFournisseurs();
     })
     .catch(() => showNotification("Erreur lors de la suppression", "error"));
+}
+
+function modifierStatutFournisseur(fournisseurId, statut) {
+  const formData = new FormData();
+  formData.append("idfour", fournisseurId);
+  formData.append("statut", statut);
+
+  fetch(getApiUrl("update_statut_fournisseur.php"), {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      showNotification(
+        data.message || "Opération terminée",
+        data.success ? "success" : "error"
+      );
+      if (data.success) loadFournisseurs();
+    })
+    .catch(() =>
+      showNotification("Erreur lors de la mise à jour du statut", "error")
+    );
+}
+
+function archiverFournisseur(fournisseurId) {
+  if (confirm("Voulez-vous archiver ce fournisseur ?")) {
+    modifierStatutFournisseur(fournisseurId, 1);
+  }
+}
+
+function restaurerFournisseur(fournisseurId) {
+  if (confirm("Voulez-vous restaurer ce fournisseur ?")) {
+    modifierStatutFournisseur(fournisseurId, 0);
+  }
 }
 
 // Charger les fournisseurs au chargement de la page

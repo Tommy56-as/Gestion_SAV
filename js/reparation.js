@@ -239,7 +239,17 @@ function openInvoice(idrep) {
   if (!r) return;
   document.getElementById(
     "factureReparationBody"
-  ).innerHTML = `<div class="invoice-repair-head"><h2>RAOUL PC SHOP</h2><h3>FACTURE DE RÉPARATION #${
+  ).innerHTML = `<div class="invoice-repair-head"><h2>${escapeReparationHtml(
+    window.APP_COMPANY?.nom || ""
+  )}</h2><p>${escapeReparationHtml(
+    [
+      window.APP_COMPANY?.telephone,
+      window.APP_COMPANY?.adresse,
+      window.APP_COMPANY?.boite_postale,
+    ]
+      .filter(Boolean)
+      .join(" | ")
+  )}</p><h3>FACTURE DE RÉPARATION #${
     r.idrep
   }</h3><p>Client : ${escapeReparationHtml(
     r.nomClient

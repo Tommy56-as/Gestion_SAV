@@ -24,7 +24,7 @@ require_once 'inc/DataBase.php';
     </div>
     <?php endif; ?>
 
-    <div class="users-grid" id="usersContainer"></div>
+    <div class="users-grid" id="usersContainer" data-current-user-id="<?= (int) current_user_id() ?>"></div>
 </div>
 <header class="header-right">
     <button class="toggle-menu-btn" id="openSidebar">

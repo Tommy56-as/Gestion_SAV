@@ -50,6 +50,18 @@ a:hover {
     vertical-align: middle;
 }
 
+.material-icons-sharp.icon-fallback {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25em;
+    height: 1.25em;
+    font-family: Arial, sans-serif;
+    font-size: 1em;
+    font-weight: 700;
+    line-height: 1;
+}
+
 .text-primary {
     color: var(--text-color-primary);
 }

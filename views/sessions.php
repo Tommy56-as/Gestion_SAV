@@ -1,4 +1,9 @@
 <section class="sessions-page">
+    <header class="header-right">
+        <button class="toggle-menu-btn" id="openSidebar">
+            <span class="material-icons-sharp">menu</span>
+        </button>
+    </header>
     <header class="sessions-heading">
         <div>
             <p class="sessions-eyebrow">Administration</p>

@@ -14,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 // Convertir les valeurs reçues et refuser les données invalides avant l'accès à la base.
 $idProduit = filter_input(INPUT_POST, 'idproduit', FILTER_VALIDATE_INT);
+$entrepriseId = require_current_entreprise_id();
 $quantite = filter_input(INPUT_POST, 'quantite_app', FILTER_VALIDATE_INT);
 $idFour = filter_input(INPUT_POST, 'idfour', FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
 $prixTotal = filter_input(INPUT_POST, 'prix_total', FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
@@ -27,8 +28,8 @@ if (!$idProduit || !$quantite || $quantite < 1 || !$dateApp) {
 
 try {
     // Mémoriser le stock au moment de la commande pour le suivi historique.
-    $productStmt = $pdo->prepare('SELECT quantite FROM produit WHERE idproduit = ?');
-    $productStmt->execute([$idProduit]);
+    $productStmt = $pdo->prepare('SELECT quantite FROM produit WHERE idEntreprise = ? AND idproduit = ?');
+    $productStmt->execute([$entrepriseId, $idProduit]);
     $product = $productStmt->fetch(PDO::FETCH_ASSOC);
     if (!$product) {
         http_response_code(404);
@@ -38,9 +39,9 @@ try {
 
     // Une commande reste en cours : le stock ne sera augmenté qu'à sa réception.
     $stmt = $pdo->prepare("INSERT INTO approvisionnement
-        (idproduit, quantite_stock, quantite_app, prix_total, idfour, statut, date_app)
-        VALUES (?, ?, ?, ?, ?, 'encours', ?)");
-    $stmt->execute([$idProduit, (int) $product['quantite'], $quantite, $prixTotal, $idFour ?: null, $dateApp]);
+        (idEntreprise, idproduit, quantite_stock, quantite_app, prix_total, idfour, statut, date_app)
+        VALUES (?, ?, ?, ?, ?, ?, 'encours', ?)");
+    $stmt->execute([$entrepriseId, $idProduit, (int) $product['quantite'], $quantite, $prixTotal, $idFour ?: null, $dateApp]);
     log_history($pdo, "Nouvelle commande d'approvisionnement pour le produit {$idProduit} avec quantité {$quantite}");
     echo json_encode(['success' => true, 'message' => 'Commande enregistrée']);
 } catch (PDOException $e) {

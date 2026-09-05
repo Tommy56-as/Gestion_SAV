@@ -103,6 +103,7 @@ function page_permission(string $page): ?string
         'Statistiques' => '__admin__',
         'autorisations' => '__admin__',
         'sessions' => '__admin__',
+        'abonnement' => '__admin__',
     ][$page] ?? null;
 }
 

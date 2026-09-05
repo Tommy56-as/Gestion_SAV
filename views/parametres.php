@@ -73,4 +73,67 @@
             Réinitialiser l'affichage
         </button>
     </form>
+
+    <section class="categories-panel">
+        <div class="settings-section-title">
+            <span class="material-icons-sharp">business</span>
+            <div>
+                <h2>Informations de l’entreprise</h2>
+                <p>Ces informations apparaissent sur vos factures.</p>
+            </div>
+        </div>
+        <form id="companyForm" class="category-form">
+            <div class="company-fields-grid">
+                <label class="company-field" for="companyName">
+                    <span>Nom de l’entreprise</span>
+                    <input id="companyName" name="nom" maxlength="150" required
+                        value="<?= htmlspecialchars($currentEntreprise['nom'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                </label>
+                <label class="company-field" for="companyAddress">
+                    <span>Adresse</span>
+                    <input id="companyAddress" name="adresse" maxlength="255"
+                        value="<?= htmlspecialchars($currentEntreprise['adresse'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                </label>
+                <label class="company-field" for="companyPhone">
+                    <span>Téléphone</span>
+                    <input id="companyPhone" name="telephone" maxlength="40"
+                        value="<?= htmlspecialchars($currentEntreprise['telephone'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                </label>
+                <label class="company-field" for="companyPostalBox">
+                    <span>Boîte postale</span>
+                    <input id="companyPostalBox" name="boite_postale" maxlength="80"
+                        value="<?= htmlspecialchars($currentEntreprise['boite_postale'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                </label>
+            </div>
+            <div class="company-form-actions">
+                <button type="submit" class="settings-action"><span class="material-icons-sharp">save</span>
+                    Enregistrer</button>
+            </div>
+            <p id="companyMessage" class="category-message" role="status"></p>
+        </form>
+    </section>
+
+    <section class="categories-panel">
+        <div class="settings-section-title">
+            <span class="material-icons-sharp">category</span>
+            <div>
+                <h2>Catégories de produits</h2>
+                <p>Créez et organisez les catégories propres à votre entreprise.</p>
+            </div>
+        </div>
+        <form id="categoryForm" class="category-form">
+            <input type="hidden" id="categoryId" name="idCategorie">
+            <label for="categoryLabel">Libellé</label>
+            <div class="category-form-row">
+                <input id="categoryLabel" name="libelle" maxlength="100" required placeholder="Ex. Électronique">
+                <button type="submit" class="settings-action" id="categorySubmit">
+                    <span class="material-icons-sharp">add</span> Ajouter
+                </button>
+                <button type="button" class="category-cancel" id="categoryCancel" hidden>Annuler</button>
+            </div>
+        </form>
+        <p id="categoryMessage" class="category-message" role="status"></p>
+        <div id="categoriesList" class="categories-list">Chargement...</div>
+    </section>
 </section>
+<script src="js/categories.js"></script>
