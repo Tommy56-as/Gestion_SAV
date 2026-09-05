@@ -1,0 +1,781 @@
+.vente-container {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+#date_vente:disabled {
+    cursor: not-allowed;
+    opacity: 0.75;
+    background: var(--desaturate-cyan-2);
+}
+
+/* Modal de vente/facture */
+.vente-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--white);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.details-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 15%;
+    width: 70%;
+    height: auto;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-content-vente {
+    background: var(--white);
+    padding: 20px;
+    border-radius: var(--border-radius-card);
+    width: 100%;
+    box-shadow: var(--box-shadow-card);
+    height: auto;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal-content-details {
+    background: var(--white);
+    padding: 20px;
+    border-radius: var(--border-radius-card);
+    width: 100%;
+    margin-top: 20%;
+    box-shadow: var(--box-shadow-card);
+    height: auto;
+    overflow-y: auto;
+}
+
+.vente-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.details-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: var(--text-color-primary);
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+    flex-shrink: 0;
+}
+
+.modal-body {
+    padding: 25px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    gap: 5px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+
+.form-section {
+    background: var(--light);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.form-section input {
+    width: 100%;
+    background: var(--white);
+    color: var(--text-color-primary);
+    border: 1px solid #375ead;
+}
+
+.form-section h3 {
+    color: var(--primary);
+    margin-bottom: 20px;
+    font-size: 16px;
+    border-bottom: 2px solid var(--primary);
+    padding-bottom: 10px;
+}
+
+.form-fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--text-color-primary);
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.product-input-section {
+    background: var(--white);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.product-input-section h4 {
+    color: var(--primary);
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.add-product-btn {
+    background: var(--fuscha);
+    color: var(--white);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.add-product-btn:hover {
+    background: var(--success);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.payment-section {
+    background: var(--light) !important;
+    padding: 20px !important;
+    border-radius: 10px !important;
+}
+
+.payment-section h4 {
+    color: var(--primary);
+    margin-bottom: 15px;
+    font-size: 14px;
+    border-bottom: 2px solid var(--primary);
+    padding-bottom: 10px;
+}
+
+.payment-fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+/* Tableau des ventes et détails */
+.table-responsive {
+    overflow-x: auto;
+    margin-bottom: 15px;
+}
+
+.sales-table,
+.products-table,
+.invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+}
+
+.sales-table thead,
+.products-table thead,
+.invoice-table thead {
+    background: var(--primary);
+    color: var(--black);
+}
+
+.sales-table th,
+.sales-table td,
+.products-table th,
+.products-table td,
+.invoice-table th,
+.invoice-table td {
+    padding: 12px 14px;
+    text-align: left;
+    font-size: 13px;
+    border: 1px solid #e5e7eb;
+}
+
+.sales-table tbody tr:nth-child(even),
+.products-table tbody tr:nth-child(even),
+.invoice-table tbody tr:nth-child(even) {
+    background: var(--light);
+}
+
+.sales-table tbody tr:hover,
+.products-table tbody tr:hover,
+.invoice-table tbody tr:hover {
+    background: var(--white);
+}
+
+.pagination-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.pagination {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.pagination button {
+    min-width: 38px;
+    background: var(--white);
+    border: 1px solid #d1d5db;
+    color: var(--text-color-primary);
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+    background: var(--primary);
+    color: var(--black);
+    border-color: var(--primary);
+}
+
+.pagination button.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+
+.pagination button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.pagination-info {
+    color: var(--text-color-secondary, #6b7280);
+    font-size: 16px;
+}
+
+/* Tableau des produits ajoutés */
+.products-table {
+    width: auto;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+.products-table thead {
+    background: var(--primary);
+    color: var(--white);
+}
+
+.products-table th,
+.products-table td {
+    padding: 10px;
+    text-align: left;
+    font-size: 12px;
+    border: 1px solid var(--white);
+}
+
+.products-table tbody tr:hover {
+    background: var(--white);
+}
+
+.remove-btn {
+    background: var(--danger);
+    color: var(--white);
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+    transition: all 0.3s ease;
+}
+
+.remove-btn:hover {
+    background: var(--danger);
+    transform: scale(1.05);
+}
+
+/* Section facture */
+.invoice-section {
+    background: var(--white);
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid white;
+    height: auto;
+    width: 500px;
+}
+
+.invoice-header {
+    text-align: center;
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--primary);
+    padding-bottom: 12px;
+}
+
+.invoice-header h3 {
+    font-size: 20px;
+    color: var(--primary);
+    margin: 0 0 5px 0;
+}
+
+.invoice-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+    font-size: 12px;
+}
+
+.invoice-info-item {
+    background: var(--white);
+    padding: 8px;
+    border-radius: 5px;
+    border-left: 3px solid var(--primary);
+}
+
+.invoice-info-item label {
+    font-weight: bold;
+    color: var(--text-color-primary);
+    display: block;
+    margin-bottom: 2px;
+}
+
+.invoice-table {
+    width: 100%;
+    margin-bottom: 15px;
+    border-collapse: collapse;
+}
+
+.invoice-table th {
+    background: var(--primary);
+    color: var(--white);
+    padding: 10px;
+    text-align: left;
+    font-size: 11px;
+}
+
+.invoice-table td {
+    padding: 8px;
+    border-bottom: 1px solid var(--white);
+    font-size: 11px;
+}
+
+.invoice-table tr:last-child td {
+    border-bottom: 2px solid var(--primary);
+}
+
+/* Totaux */
+.invoice-totals {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+
+.totals-box {
+    width: 250px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.total-row.final {
+    font-weight: bold;
+    font-size: 13px;
+    border-top: 2px solid var(--primary);
+    border-bottom: 2px solid var(--primary);
+    padding: 10px 0;
+    background: var(--white);
+    color: var(--primary);
+}
+
+.total-row label {
+    font-weight: 600;
+}
+
+.total-row.remboursement {
+    color: var(--success);
+}
+
+/* Boutons d'actions */
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+}
+
+.btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-secondary {
+    background: var(--text-color-primary);
+    color: var(--white);
+}
+
+.btn-print {
+    background: var(--primary);
+    color: var(--black);
+    flex: 1;
+}
+
+.btn-reset {
+    background: var(--text-color-primary);
+    color: var(--light);
+    flex: 1;
+}
+
+.btn-reset:hover {
+    background: var(--text-color-primary);
+    transform: translateY(-2px);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Indicateurs de stock */
+#stockInfo {
+    font-size: 11px;
+    font-weight: 500;
+    margin-left: 8px;
+    display: inline-block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.form-group label span {
+    transition: all 0.2s ease;
+}
+
+@media (max-width: 1024px) {
+    .modal-body {
+        grid-template-columns: 1fr;
+    }
+
+    .product-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    /* Masquer tous les éléments inutiles */
+    * {
+        margin: 0;
+        padding: 0;
+        color: black;
+        background: white;
+    }
+
+    body,
+    html {
+        width: 100%;
+        height: auto;
+        padding: 0;
+        margin: 0;
+    }
+
+    .modal-header,
+    .form-section,
+    .modal-actions,
+    .btn,
+    .header-buttons,
+    .product-input-section,
+    .modal-body>div:first-child,
+    .modal-close {
+        display: none !important;
+    }
+
+    /* Masquer le bouton d'impression dans la facture */
+    .invoice-section .btn-print,
+    .invoice-section button {
+        display: none !important;
+    }
+
+    .modal-content {
+        width: 100%;
+        max-width: 100%;
+        box-shadow: none;
+        border: none;
+        padding: 0;
+    }
+
+    .modal-content-vente {
+        padding: 10px;
+        box-shadow: none;
+        border: none;
+    }
+
+    .invoice-section {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+        margin: 0;
+        background: white;
+        max-width: 70mm;
+    }
+
+    /* En-tête de facture */
+    .invoice-header {
+        text-align: center;
+        margin-bottom: 5px;
+        border-bottom: 1px solid black;
+        padding-bottom: 5px;
+    }
+
+    .invoice-header h2 {
+        font-size: 12px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .invoice-header h4 {
+        font-size: 8px;
+        margin: 2px 0 0 0;
+    }
+
+    .invoice-header h3 {
+        font-size: 11px;
+        font-weight: bold;
+        margin: 3px 0 0 0;
+    }
+
+    .invoice-header p {
+        font-size: 8px;
+        margin: 2px 0 0 0;
+    }
+
+    /* Infos client */
+    .invoice-info {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0;
+        margin-bottom: 8px;
+        font-size: 9px;
+    }
+
+    .invoice-info-item {
+        background: white;
+        padding: 2px 0;
+        border-radius: 0;
+        border-left: none;
+        border-bottom: none;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .invoice-info-item label {
+        font-weight: bold;
+        display: inline;
+        margin-bottom: 0;
+    }
+
+    .invoice-info-item span {
+        text-align: right;
+    }
+
+    /* Table des produits */
+    .invoice-table {
+        width: 100%;
+        margin-bottom: 8px;
+        border-collapse: collapse;
+        font-size: 8px;
+    }
+
+    .invoice-table th {
+        background: white;
+        color: black;
+        padding: 2px 3px;
+        text-align: left;
+        font-size: 8px;
+        font-weight: bold;
+        border-bottom: 1px solid black;
+    }
+
+    .invoice-table td {
+        padding: 2px 3px;
+        border-bottom: none;
+        font-size: 8px;
+        color: black;
+    }
+
+    .invoice-table tr:last-child td {
+        border-bottom: 1px solid black;
+    }
+
+    /* Totaux */
+    .invoice-totals {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 8px;
+    }
+
+    .totals-box {
+        width: 100%;
+    }
+
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 2px 0;
+        font-size: 8px;
+        border-bottom: none;
+        color: black;
+        background: white;
+    }
+
+    .total-row label {
+        font-weight: bold;
+    }
+
+    .total-row.final {
+        font-weight: bold;
+        font-size: 9px;
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+        padding: 3px 0;
+        background: white;
+        color: black;
+    }
+
+    .total-row.remboursement {
+        color: black;
+    }
+
+    /* Texte de conclusion */
+    .invoice-section>p {
+        font-size: 8px;
+        text-align: center;
+        margin-top: 5px;
+        padding-top: 5px;
+        border-top: 1px solid black;
+        color: black;
+    }
+
+    .vente-modal {
+        background: transparent;
+        padding: 0;
+        margin: 0;
+    }
+
+    .details-modal {
+        background: transparent;
+        padding: 0;
+        margin: 0;
+    }
+
+    .modal-body {
+        display: block;
+        padding: 0;
+        gap: 0;
+    }
+
+    @page {
+        size: 80mm auto;
+        margin: 3mm;
+    }
+}
+
+.vente-modal {
+    background: rgba(0, 0, 0, 0.5);
+    /* remplace var(--white) qui causait le fond blanc */
+}
+
+/* La section facture ne dépasse pas sur mobile */
+.invoice-section {
+    max-width: 100%;
+    overflow-x: auto;
+}

@@ -1,0 +1,226 @@
+.reparations-page {
+    padding: 0 20px 30px;
+}
+
+.reparations-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.reparation-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, .55);
+}
+
+.reparation-modal.is-open {
+    display: flex;
+}
+
+.reparation-modal-content {
+    position: relative;
+    width: min(850px, 100%);
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 30px;
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .25);
+}
+
+.reparation-modal-content h2 {
+    margin-bottom: 22px;
+    color: var(--primary);
+}
+
+.reparation-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.reparation-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+}
+
+.reparation-form-grid textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.reparation-pieces-builder {
+    margin-top: 20px;
+    padding: 16px;
+    border: 1px solid var(--desaturate-cyan);
+    border-radius: 10px;
+}
+
+.reparation-pieces-builder h3 {
+    margin-bottom: 12px;
+    color: var(--primary);
+}
+
+.piece-entry {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 100px auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.piece-entry select,
+.piece-entry input {
+    min-width: 0;
+    padding: 10px;
+    border: 1px solid #aaa;
+    border-radius: 7px;
+}
+
+.pieces-table {
+    width: 100%;
+    margin-top: 14px;
+    border-collapse: collapse;
+}
+
+.pieces-table th,
+.pieces-table td {
+    padding: 9px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.piece-remove,
+.reparation-action {
+    border: 0;
+    border-radius: 6px;
+    padding: 6px 8px;
+    background: var(--danger);
+    color: var(--white);
+    cursor: pointer;
+}
+
+.reparation-action {
+    margin-right: 5px;
+    background: var(--primary);
+}
+
+.reparation-message {
+    margin-left: 0;
+}
+
+.details-total {
+    margin-top: 18px;
+    padding: 12px;
+    background: var(--light);
+    border-radius: 8px;
+    line-height: 1.8;
+}
+
+.invoice-repair-head {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.invoice-repair-head h2 {
+    color: var(--primary);
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    #factureReparationContent,
+    #factureReparationContent * {
+        visibility: visible;
+    }
+
+    #factureReparationContent {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        box-shadow: none;
+        max-height: none;
+        border-radius: 0;
+    }
+
+    #printReparationInvoice,
+    .reparation-modal-close {
+        display: none;
+    }
+}
+
+.reparations-list {
+    background: var(--white);
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: var(--box-shadow-card);
+}
+
+.reparations-list table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+}
+
+.reparations-list th,
+.reparations-list td {
+    padding: 13px 10px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+}
+
+.reparation-status {
+    padding: 7px;
+    border: 1px solid #aaa;
+    border-radius: 7px;
+}
+
+.reparation-status:disabled {
+    cursor: not-allowed;
+    opacity: .7;
+}
+
+.reparation-message {
+    border: 0;
+    border-radius: 6px;
+    padding: 7px 9px;
+    background: var(--success);
+    color: var(--white);
+    cursor: pointer;
+}
+
+@media (max-width: 700px) {
+    .reparations-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .reparation-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .piece-entry {
+        grid-template-columns: 1fr;
+    }
+
+    .reparation-modal-content {
+        padding: 24px 16px;
+    }
+
+    .reparations-list {
+        padding: 14px 8px;
+    }
+}
