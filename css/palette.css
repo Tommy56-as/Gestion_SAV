@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Roboto+Slab:wght@400;500;600;700&display=swap');
+
+:root {
+    --app-font: 'Nunito', sans-serif;
+    --base-font-size: 14px;
+    --primary: #4361ee;
+    --secondary: #3f37c9;
+    --white: #fff;
+    --light: #f3f4ee;
+    --danger: red;
+    --success: hsl(184, 46%, 57%);
+    --black: #0f0f0e;
+
+    --fuscha: hsl(334, 94%, 57%);
+    --desaturate-fuscha: color-mix(in srgb, var(--fuscha) 15%, transparent);
+    --desaturate-fuscha-2: color-mix(in srgb, var(--fuscha) 10%, transparent);
+
+    --cyan: hsl(184, 46%, 57%);
+    --desaturate-cyan: color-mix(in srgb, var(--cyan) 25%, transparent);
+    --desaturate-cyan-2: color-mix(in srgb, var(--cyan) 15%, transparent);
+
+    --light-blue: #bbeef1;
+    --pinkless: #fff3f0;
+    --yellow: #f1b813;
+
+    --text-color-primary: #314657;
+    --text-color-secondary: #58626e;
+    --text-color-third: #9db3be;
+
+    --box-shadow-card: 8px 8px 32px var(--desaturate-fuscha);
+    --box-shadow-card-2: 8px 8px 32px var(--desaturate-cyan);
+    --box-sidebar: 2px 4px 16px var(--desaturate-cyan-2);
+
+    --padding-card: 28px;
+
+    --border-radius-rounded: 50%;
+    --border-radius-4: 4px;
+    --border-radius-8: 8px;
+    --border-radius-12: 12px;
+    --border-radius-card: var(--padding-card);
+}
+
+.dark-mode {
+    --black: #fefefe;
+    --white: #393e46;
+    --light: #222831;
+    --primary: #4361ee;
+    --secondary: #3f37c9;
+    --desaturate-fuscha: hsla(334, 8%, 67%, 0.15);
+
+    --text-color-primary: #eee;
+    --text-color-secondary: #eee;
+
+    --box-shadow-card: 8px 8px 32px var(--desaturate-fuscha);
+    --box-shadow-card-2: 8px 8px 32px var(--desaturate-cyan);
+
+}

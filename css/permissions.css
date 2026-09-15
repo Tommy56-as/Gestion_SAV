@@ -1,0 +1,245 @@
+.permissions-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 32px 56px;
+}
+
+.permissions-heading,
+.revenue-heading,
+.permission-user-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.permissions-heading {
+    margin-bottom: 24px;
+}
+
+.permissions-eyebrow {
+    color: var(--fuscha);
+    font-size: .8rem;
+    font-weight: 800;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.permissions-heading h1,
+.revenue-heading h2,
+.permission-user h2 {
+    color: var(--text-color-primary);
+}
+
+.permissions-heading p:not(.permissions-eyebrow),
+.revenue-heading p,
+.permission-user-heading p {
+    color: var(--text-color-secondary);
+}
+
+.permissions-heading-icon,
+.revenue-heading>.material-icons-sharp {
+    color: var(--cyan);
+    font-size: 48px;
+}
+
+.permissions-panel,
+.revenue-panel {
+    background: var(--white);
+    border: 1px solid var(--desaturate-cyan);
+    border-radius: var(--border-radius-12);
+    box-shadow: var(--box-shadow-card-2);
+    padding: 24px;
+}
+
+.permissions-message {
+    min-height: 0;
+    margin-bottom: 0;
+    color: var(--text-color-secondary);
+}
+
+.permissions-message.success,
+.permissions-message.error {
+    margin-bottom: 16px;
+    padding: 10px 12px;
+    border-radius: var(--border-radius-8);
+}
+
+.permissions-message.success {
+    background: var(--desaturate-cyan);
+    color: var(--cyan);
+}
+
+.permissions-message.error {
+    background: var(--desaturate-fuscha);
+    color: var(--fuscha);
+}
+
+.permission-user {
+    padding: 22px 0;
+    border-bottom: 1px solid var(--desaturate-cyan-2);
+}
+
+.permission-user:first-child {
+    padding-top: 0;
+}
+
+.permission-user:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+.permission-user-heading {
+    align-items: flex-start;
+}
+
+.permission-user-heading h2 {
+    font-size: 1.1rem;
+    margin-bottom: 4px;
+}
+
+.permission-user-heading p {
+    font-size: .88rem;
+}
+
+.permission-save {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 12px;
+    border: 0;
+    border-radius: var(--border-radius-8);
+    background: var(--fuscha);
+    color: var(--white);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.permission-groups {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.permission-groups fieldset {
+    display: grid;
+    gap: 9px;
+    padding: 12px;
+    border: 1px solid var(--desaturate-cyan);
+    border-radius: var(--border-radius-8);
+}
+
+.permission-groups legend {
+    padding: 0 5px;
+    color: var(--text-color-primary);
+    font-weight: 800;
+}
+
+.permission-groups label {
+    color: var(--text-color-secondary);
+    font-size: .9rem;
+}
+
+.permission-groups input {
+    accent-color: var(--fuscha);
+}
+
+.revenue-panel {
+    margin-top: 24px;
+}
+
+.revenue-heading {
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.revenue-heading h2 {
+    margin-bottom: 5px;
+}
+
+.revenue-heading p {
+    font-size: .9rem;
+}
+
+.revenue-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.revenue-card {
+    border: 1px solid var(--desaturate-cyan);
+    border-radius: var(--border-radius-8);
+    overflow: auto;
+}
+
+.revenue-card h3 {
+    padding: 14px;
+    color: var(--fuscha);
+    font-size: 1rem;
+}
+
+.revenue-card table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.revenue-card th,
+.revenue-card td {
+    padding: 11px 14px;
+    text-align: left;
+    border-top: 1px solid var(--desaturate-cyan-2);
+    color: var(--text-color-secondary);
+}
+
+.revenue-card th {
+    color: var(--text-color-primary);
+}
+
+.revenue-card td:last-child,
+.revenue-card th:last-child {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.revenue-card p {
+    padding: 0 14px 14px;
+    color: var(--text-color-secondary);
+}
+
+@media (max-width: 768px) {
+    .permissions-page {
+        padding: 24px 16px 40px;
+    }
+
+    .permissions-heading h1 {
+        font-size: 1.5rem;
+    }
+
+    .permissions-heading-icon,
+    .revenue-heading>.material-icons-sharp {
+        font-size: 38px;
+    }
+
+    .permissions-panel,
+    .revenue-panel {
+        padding: 18px;
+    }
+
+    .permission-user-heading {
+        flex-direction: column;
+    }
+
+    .permission-save {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .permission-groups,
+    .revenue-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,239 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+    --night: #101827;
+    --night-soft: #17253a;
+    --cyan: #41d6c3;
+    --lime: #d8f36b;
+    --ink: #eaf4f2;
+    --muted: #9fb5bb;
+    --line: rgba(255, 255, 255, .14);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    display: grid;
+    place-items: center;
+    padding: 28px;
+    color: var(--ink);
+    background: var(--night);
+    font-family: 'Space Grotesk', sans-serif;
+    overflow: hidden;
+}
+
+body::before,
+body::after {
+    content: '';
+    position: fixed;
+    pointer-events: none;
+    border: 1px solid rgba(65, 214, 195, .25);
+    transform: rotate(35deg);
+}
+
+body::before {
+    width: 520px;
+    height: 520px;
+    top: -270px;
+    right: -140px;
+    box-shadow: 0 0 0 42px rgba(216, 243, 107, .05), 0 0 0 84px rgba(65, 214, 195, .04);
+}
+
+body::after {
+    width: 300px;
+    height: 300px;
+    bottom: -190px;
+    left: -130px;
+}
+
+.super-login-shell {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 980px);
+    display: grid;
+    grid-template-columns: 1.05fr .95fr;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    background: rgba(23, 37, 58, .92);
+    box-shadow: 0 28px 80px rgba(0, 0, 0, .35);
+}
+
+.super-login-intro {
+    padding: 58px 48px;
+    background: linear-gradient(145deg, #1c344b, #122438);
+}
+
+.super-mark {
+    display: grid;
+    width: 58px;
+    height: 58px;
+    place-items: center;
+    margin-bottom: 44px;
+    border: 1px solid rgba(216, 243, 107, .5);
+    border-radius: 16px;
+    color: var(--lime);
+    background: rgba(216, 243, 107, .08);
+}
+
+.super-mark .material-icons-sharp {
+    font-size: 30px;
+}
+
+.super-kicker {
+    color: var(--cyan);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+
+.super-login-intro h1 {
+    max-width: 390px;
+    margin: 14px 0 18px;
+    color: #fff;
+    font-size: clamp(2rem, 4vw, 3.3rem);
+    line-height: 1.03;
+    letter-spacing: -.06em;
+}
+
+.super-login-intro p {
+    max-width: 390px;
+    color: var(--muted);
+    line-height: 1.65;
+}
+
+.super-login-points {
+    display: grid;
+    gap: 12px;
+    margin-top: 42px;
+    padding: 0;
+    list-style: none;
+    color: #c9dbd9;
+    font-size: .88rem;
+}
+
+.super-login-points li {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.super-login-points .material-icons-sharp {
+    color: var(--lime);
+    font-size: 18px;
+}
+
+.super-login-form {
+    padding: 58px 48px;
+    background: #f6fbfa;
+    color: #172b37;
+}
+
+.super-login-form h2 {
+    margin: 0 0 8px;
+    font-size: 1.7rem;
+    letter-spacing: -.04em;
+}
+
+.super-login-form>p {
+    margin: 0 0 30px;
+    color: #6c8084;
+    font-size: .9rem;
+    line-height: 1.5;
+}
+
+.super-login-form label {
+    display: block;
+    margin-bottom: 8px;
+    color: #304953;
+    font-size: .8rem;
+    font-weight: 700;
+}
+
+.super-login-form .form-group {
+    margin-bottom: 19px;
+}
+
+.super-login-form input {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid #d4e3e1;
+    border-radius: 9px;
+    outline: none;
+    color: #172b37;
+    background: #fff;
+    font: inherit;
+}
+
+.super-login-form input:focus {
+    border-color: #21a99b;
+    box-shadow: 0 0 0 3px rgba(33, 169, 155, .12);
+}
+
+.super-login-submit {
+    width: 100%;
+    margin-top: 8px;
+    padding: 14px;
+    border: 0;
+    border-radius: 9px;
+    color: #10202b;
+    background: var(--lime);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.super-login-submit:hover {
+    background: #e5ff88;
+}
+
+.super-login-error {
+    margin-bottom: 18px;
+    padding: 11px 12px;
+    border: 1px solid #f0c6c2;
+    border-radius: 8px;
+    color: #a64038;
+    background: #fff3f1;
+    font-size: .82rem;
+}
+
+.super-login-link {
+    display: inline-block;
+    margin-top: 22px;
+    color: #187d75;
+    font-size: .82rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.super-login-link:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 760px) {
+    body {
+        overflow: auto;
+    }
+
+    .super-login-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .super-login-intro,
+    .super-login-form {
+        padding: 34px 26px;
+    }
+
+    .super-mark {
+        margin-bottom: 28px;
+    }
+
+    .super-login-points {
+        margin-top: 28px;
+    }
+}
