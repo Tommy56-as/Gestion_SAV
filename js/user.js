@@ -1,10 +1,10 @@
 // Variables globales
 let editingUserId = null;
-const BASE_URL = window.location.origin + "/GESTION_SAV/";
+const BASE_URL = window.location.origin + "/Gestion_SAV/";
 
 // Fonction pour construire l'URL correcte
 function getApiUrl(endpoint) {
-  return `${window.location.origin}/GESTION_SAV/Controller/users/${endpoint}`;
+  return `${window.location.origin}/Gestion_SAV/Controller/users/${endpoint}`;
 }
 function loadUsers() {
   const container = document.getElementById("usersContainer");
@@ -172,38 +172,47 @@ document.getElementById("updateUser").addEventListener("click", function () {
 
 // Fonction pour éditer un utilisateur
 function editUser(userId) {
-  const url = getApiUrl(`getUserById.php?id=${userId}`);
+  const url = getApiUrl(`getUserByID.php?id=${userId}`);
 
   fetch(url)
-    .then((response) => response.json())
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Erreur HTTP : ${response.status}`);
+      }
+      return response.json();
+    })
     .then((data) => {
       if (!data.success) {
-        showNotification(data.message, "error");
+        showNotification(data.message || "Erreur lors de la récupération", "error");
         return;
       }
 
       const u = data.user;
 
-      editingUserId = u.idUser;
-      document.getElementById("nomUtilisateur").value = u.Nom_Utilisateur;
-      document.getElementById("email").value = u.Email;
-      document.getElementById("typeCompte").value = u.TypeDeCompte;
-      document.getElementById("nomComplet").value = u.NomComplet;
-      document.getElementById("telephone").value = u.Telephone;
-      document.getElementById("adresse").value = u.Adresse;
+      // CORRECTION 2 : Sécurité sur la casse de l'ID utilisateur (gère idUser, iduser ou id_user)
+      editingUserId = u.idUser || u.iduser || u.id_user;
+      
+      document.getElementById("nomUtilisateur").value = u.Nom_Utilisateur || u.nom_utilisateur || "";
+      document.getElementById("email").value = u.Email || u.email || "";
+      document.getElementById("typeCompte").value = u.TypeDeCompte || u.type_compte || "";
+      document.getElementById("nomComplet").value = u.NomComplet || u.nom_complet || "";
+      document.getElementById("telephone").value = u.Telephone || u.telephone || "";
+      document.getElementById("adresse").value = u.Adresse || u.adresse || "";
+      
       document.getElementById("motDePasse").value = "";
       document.getElementById("passwordHint").style.display = "block";
-      document.getElementById("modalTitle").textContent =
-        "Modifier l'utilisateur";
+      document.getElementById("modalTitle").textContent = "Modifier l'utilisateur";
       document.getElementById("saveUser").style.display = "none";
       document.getElementById("updateUser").style.display = "block";
       document.getElementById("userModal").style.display = "flex";
     })
     .catch((err) => {
+      // CORRECTION 1 : Suppression de la faute de frappe erroupdateUserr
       console.error(err);
       showNotification("Erreur chargement utilisateur", "error");
     });
 }
+
 
 // Fonction pour mettre à jour un utilisateur
 function updateUser() {

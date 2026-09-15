@@ -1,5 +1,5 @@
 <?php
-require_once 'inc/DataBase.php';
+require_once 'inc/Database.php';
 ?>
 <style>
 

@@ -1,6 +1,6 @@
 <?php
 require_once '../admin_auth.php';
-require_once '../../inc/DataBase.php';
+require_once '../../inc/Database.php';
 require_permission('vente.read');
 header('Content-Type: application/json');
 

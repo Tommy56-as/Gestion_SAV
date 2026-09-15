@@ -1,11 +1,11 @@
 let selectedImage = null;
 let editingidProduit = null;
 
-const BASE_URL = window.location.origin + "/GESTION_SAV/";
+const BASE_URL = window.location.origin + "/Gestion_SAV/";
 
 // Fonction pour construire l'URL correcte
 function getApiUrl(endpoint) {
-  return `${window.location.origin}/GESTION_SAV/Controller/produit/${endpoint}`;
+  return `${window.location.origin}/Gestion_SAV/Controller/produit/${endpoint}`;
 }
 // Fonction pour charger les produits depuis le serveur
 function loadProduits() {

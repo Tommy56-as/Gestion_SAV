@@ -1,4 +1,10 @@
 <?php 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Le reste de votre code commence ici...
+
 require_once 'Controller/admin_auth.php';
 require_once 'inc/authorization.php';
 require_once 'inc/saas.php';
@@ -41,7 +47,10 @@ if ($requiredPermission === '__admin__' && !is_admin()) {
 ?>
 <?php include 'Model/header.php'; ?>
 <?php $currentEntreprise = current_entreprise($pdo); ?>
-<script>window.APP_COMPANY = <?= json_encode($currentEntreprise, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;</script>
+<script>
+window.APP_COMPANY =
+    <?= json_encode($currentEntreprise, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+</script>
 
 <div class="dashboard-container">
 

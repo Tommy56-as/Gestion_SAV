@@ -1,6 +1,6 @@
 <?php
 error_reporting(E_ALL);
-ini_set('display_errors', 0); // Désactive l'affichage d'erreurs HTML
+ini_set('display_errors', 1); // Désactive l'affichage d'erreurs HTML
 require_once '../admin_auth.php';
 require_permission('produit.create');
 require_csrf();

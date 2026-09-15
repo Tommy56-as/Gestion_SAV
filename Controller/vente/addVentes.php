@@ -1,6 +1,6 @@
 <?php
 require_once '../admin_auth.php';
-require_once '../../inc/DataBase.php';
+require_once '../../inc/Database.php';
 require_once '../../inc/history.php';
 require_permission('vente.create');
 require_csrf();

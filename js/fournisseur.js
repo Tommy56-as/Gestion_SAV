@@ -2,11 +2,11 @@
 const btnUpdate = document.getElementById("updateFournisseur");
 const btnAdd = document.getElementById("saveFournisseur");
 let editingFournisseurId = null;
-const BASE_URL = window.location.origin + "/GESTION_SAV/";
+const BASE_URL = window.location.origin + "/Gestion_SAV/";
 
 // Fonction pour construire l'URL correcte
 function getApiUrl(endpoint) {
-  return `${window.location.origin}/GESTION_SAV/Controller/fournisseur/${endpoint}`;
+  return `${window.location.origin}/Gestion_SAV/Controller/fournisseur/${endpoint}`;
 }
 // Fonction pour charger les fournisseurs
 function loadFournisseurs() {

@@ -1,6 +1,6 @@
 <?php
 require_once '../admin_auth.php';
-require_once '../../inc/DataBase.php';
+require_once '../../inc/Database.php';
 header('Content-Type: application/json');
 
 if($_SERVER['REQUEST_METHOD'] === 'GET') {

@@ -1,5 +1,5 @@
 // Gestion des ventes et factures avec support multi-produits
-const BASE_URL = window.location.origin + "/GESTION_SAV/";
+const BASE_URL = window.location.origin + "/Gestion_SAV/";
 let productsData = {};
 let addedProducts = []; // Tableau des produits ajoutés à la facture
 let salesData = [];
