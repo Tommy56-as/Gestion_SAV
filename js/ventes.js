@@ -905,6 +905,7 @@ function validateAndSubmitSale(
         setTimeout(() => {
           document.getElementById("venteModal").classList.remove("active");
           resetForm();
+          loadSalesList();
         }, 1500);
       } else {
         showNotification(

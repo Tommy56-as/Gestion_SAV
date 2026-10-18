@@ -1,6 +1,6 @@
 <?php
 error_reporting(E_ALL);
-ini_set('display_errors', 1); // Désactive l'affichage d'erreurs HTML
+ini_set('display_errors', 0);
 require_once '../admin_auth.php';
 require_permission('produit.create');
 require_csrf();
@@ -18,7 +18,7 @@ try {
                 throw new Exception('Le champ ' . $field . ' est requis');
             }
         }
-
+        
         // Validation de l'image (obligatoire)
         if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
             throw new Exception('Une image est requise et doit être valide');
