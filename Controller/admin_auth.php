@@ -16,6 +16,8 @@ if (!is_authenticated() || !isset($_SESSION['user_email'])) {
     exit;
 }
 
+require_subscription_write_access($pdo);
+
 // Vérifier le timeout de session (30 minutes)
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity']) > 1800) {
     log_history($pdo, 'Déconnexion automatique après expiration de session', $_SESSION['user_nom'] ?? 'Utilisateur');

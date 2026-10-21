@@ -50,28 +50,13 @@ function initPasswordToggle() {
 function initErrorMessages() {
   const errorContainer = document.getElementById("error-messages");
   if (!errorContainer) return;
-
-  // Fonction pour masquer le conteneur d'erreurs
   const hideErrors = () => {
-    errorContainer.style.transition =
-      "opacity 0.3s ease-out, transform 0.3s ease-out";
-    errorContainer.style.opacity = "0";
-    errorContainer.style.transform = "translateY(-10px)";
-
-    setTimeout(() => {
-      errorContainer.style.display = "none";
-    }, 300);
+    errorContainer.hidden = true;
   };
-
-  // Disparition automatique après 5 secondes
-  const autoHideTimeout = setTimeout(hideErrors, 5000);
-
-  // Gestion des clics sur les boutons dismiss
   const dismissButtons = document.querySelectorAll(".dismiss-error");
   dismissButtons.forEach((btn) => {
     btn.addEventListener("click", function (e) {
       e.preventDefault();
-      clearTimeout(autoHideTimeout);
       hideErrors();
     });
   });
@@ -83,15 +68,39 @@ function initErrorMessages() {
 function initFormValidation() {
   const form = document.getElementById("loginForm");
   if (!form) return;
+  const emailInput = document.getElementById("login-email");
+  const passwordInput = document.getElementById("login-password");
+  const validationMessage = document.getElementById("login-validation-message");
 
   form.addEventListener("submit", function (e) {
-    const email = document.getElementById("login-email").value.trim();
-    const password = document.getElementById("login-password").value.trim();
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
 
     if (!email || !password) {
       e.preventDefault();
-      showValidationError("Veuillez remplir tous les champs");
+      showValidationError(
+        validationMessage,
+        "Veuillez saisir votre adresse e-mail et votre mot de passe."
+      );
       return false;
+    }
+
+    if (!emailInput.validity.valid) {
+      e.preventDefault();
+      showValidationError(
+        validationMessage,
+        "Veuillez saisir une adresse e-mail valide."
+      );
+      emailInput.focus();
+      return false;
+    }
+
+    validationMessage.hidden = true;
+  });
+
+  emailInput.addEventListener("input", () => {
+    if (!emailInput.value || emailInput.validity.valid) {
+      validationMessage.hidden = true;
     }
   });
 }
@@ -128,7 +137,8 @@ function initSuccessModal() {
 /**
  * Afficher un message d'erreur de validation
  */
-function showValidationError(message) {
-  alert(message);
-  // Optionnel: Vous pouvez remplacer alert() par une notification personnalisée
+function showValidationError(container, message) {
+  if (!container) return;
+  container.textContent = message;
+  container.hidden = false;
 }

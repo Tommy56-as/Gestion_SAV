@@ -16,6 +16,16 @@
 - [x] 6. Styles CSS des nouvelles sections (graphe-hebdo, graphe-double, graphe-doughnut) dans `css/graphe.css`
 - [x] 7. Vérifier la syntaxe PHP
 
+## Catalogue produits
+
+- [x] Ajouter l'export du catalogue de l'entreprise courante vers l'impression PDF (format A4)
+- [x] Inclure les images, caractéristiques, catégories et prix des produits
+
+## Abonnement expiré
+
+- [x] Conserver l'accès aux pages et données en consultation après expiration
+- [x] Bloquer les requêtes de modification et afficher un avis avec lien vers les abonnements
+
 ## Fichiers modifiés
 
 - `views/graphe.php` (icônes material + 2 nouveaux graphiques Chart.js + données réelles)

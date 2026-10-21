@@ -54,6 +54,32 @@ function subscription_is_active(array $subscription): bool
         && ($subscription['date_fin'] ?? '') >= date('Y-m-d');
 }
 
+function entreprise_subscription_is_active(PDO $pdo): bool
+{
+    $subscription = current_subscription($pdo);
+    return $subscription !== null && subscription_is_active($subscription);
+}
+
+function require_subscription_write_access(PDO $pdo): void
+{
+    if (entreprise_subscription_is_active($pdo)) {
+        return;
+    }
+
+    if (in_array($_SERVER['REQUEST_METHOD'] ?? 'GET', ['GET', 'HEAD'], true)) {
+        return;
+    }
+
+    http_response_code(402);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode([
+        'success' => false,
+        'code' => 'subscription_read_only',
+        'message' => 'Votre abonnement est terminé. Vous pouvez consulter vos données, mais une nouvelle souscription est nécessaire pour effectuer cette action.',
+    ]);
+    exit;
+}
+
 function subscription_feature(PDO $pdo, string $feature): ?array
 {
     $subscription = current_subscription($pdo);

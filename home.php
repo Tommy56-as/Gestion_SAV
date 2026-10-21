@@ -11,6 +11,7 @@ require_once 'inc/saas.php';
 
 $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
 $title = $page;
+$subscriptionActive = entreprise_subscription_is_active($pdo);
 
 $pageFeature = [
     'dashboard' => 'dashboard',
@@ -59,6 +60,13 @@ window.APP_COMPANY =
 
     <!-- Contenu dynamique -->
     <div class="main-container">
+        <?php if (!$subscriptionActive): ?>
+        <div class="subscription-readonly-banner" role="alert">
+            <span class="material-icons-sharp" aria-hidden="true">warning</span>
+            <p>Votre période d’essai ou abonnement est terminé. Vous pouvez consulter vos données en lecture seule; une nouvelle souscription est nécessaire pour ajouter ou modifier des informations.</p>
+            <a href="home.php?page=abonnement">Voir les abonnements</a>
+        </div>
+        <?php endif; ?>
         <?php if (isset($_SESSION['access_error'])): ?>
         <div class="notification error" role="alert">
             <?= htmlspecialchars($_SESSION['access_error'], ENT_QUOTES, 'UTF-8') ?>

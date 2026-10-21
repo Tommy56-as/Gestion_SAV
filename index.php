@@ -57,7 +57,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 <h2 style="font-size: 2.5rem;text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);margin-bottom: 10px;">
                     Connexion
                 </h2>
-                <p class="login-intro temporary-message">Ravi de vous revoir. Connectez-vous pour retrouver votre activité.</p>
+                <p class="login-intro temporary-message">Ravi de vous revoir. Connectez-vous pour retrouver votre
+                    activité.</p>
                 <?php if ($installationSuccess): ?>
                 <div class="installation-success" role="status">
                     <i class="fas fa-check-circle"></i>
@@ -66,7 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 <?php endif; ?>
                 <!-- Affichage des messages d'erreur disparait apres 5s, refresh ou bouton dismiss-->
                 <?php if(isset($message) && !empty($message)): ?>
-                <div class="error-messages" id="error-messages" style="margin-bottom: 20px;">
+                <div class="error-messages" id="error-messages" role="alert" aria-live="assertive"
+                    style="margin-bottom: 20px;">
                     <?php foreach($message as $index => $msg): ?>
                     <p class="error-message-item"
                         style="text-align: center; color: #e74c3c; font-weight: 600; margin-bottom: 5px; background: rgba(231, 76, 60, 0.1); padding: 10px; border-radius: 5px;">
@@ -121,9 +123,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 </dialog>
                 <?php endif; ?>
 
-                <form id="loginForm" action="" method="POST">
+                <form id="loginForm" action="" method="POST" novalidate>
                     <input type="hidden" name="csrf_token"
                         value="<?= htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8') ?>">
+                    <div id="login-validation-message" class="error-messages" role="alert" aria-live="assertive" hidden>
+                    </div>
                     <div class="form-group">
                         <label for="login-email"
                             style="display: block; margin-bottom: 8px; font-weight: 500;">Email</label>
@@ -139,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                         <div class="input-with-icon password-input">
                             <i class="fas fa-lock"></i>
                             <input type="password" id="login-password" name="password"
-                                placeholder="Entrez votre mot de passe" minlength="8" required>
+                                placeholder="Entrez votre mot de passe" required>
                             <button type="button" class="password-toggle" id="login-toggle">
                                 <i class="fas fa-eye"></i>
                             </button>
@@ -148,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
                     <button type="submit" class="button">Se connecter</button>
                     <div class="link-container">
-                        <p><a href="#" class="link">Mot de passe oublié ?</a></p>
+                        <p><a href="mot_de_passe_oublie.php" class="link">Mot de passe oublié ?</a></p>
                     </div>
                 </form>
             </section>
@@ -158,7 +162,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     <!-- Scripts -->
     <script type="text/javascript" src="js/script.js"></script>
     <script type="text/javascript" src="js/login.js"></script>
-
 </body>
 
 </html>

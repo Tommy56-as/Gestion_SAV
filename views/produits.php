@@ -16,6 +16,9 @@ require_once 'inc/Database.php';
         </header>
         <div class="search-container" style="padding-right: 40px;">
             <input type="text" name="search" class="search-box" placeholder="Rechercher un produit...">
+            <a class="btn btn-primary" href="Controller/produit/catalogue.php" target="_blank" rel="noopener">
+                <span class="material-icons-sharp">picture_as_pdf</span> Exporter le catalogue PDF
+            </a>
             <button class="btn btn-primary" id="addProductBtn">
                 <span class="material-icons-sharp">add_shopping_cart</span> Ajouter un produit
             </button>

@@ -600,3 +600,50 @@ h1 {
     opacity: 1;
     display: block !important;
 }
+
+.subscription-readonly-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 18px 24px;
+    padding: 14px 18px;
+    border: 1px solid #e4b84b;
+    border-left: 5px solid #d99b13;
+    border-radius: 6px;
+    background: #fff7df;
+    color: #473914;
+}
+
+.subscription-readonly-banner > .material-icons-sharp {
+    flex: 0 0 auto;
+    color: #a66b00;
+}
+
+.subscription-readonly-banner p {
+    flex: 1;
+    margin: 0;
+    line-height: 1.45;
+}
+
+.subscription-readonly-banner a {
+    flex: 0 0 auto;
+    color: #145b50;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+@media (max-width: 700px) {
+    .subscription-readonly-banner {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        margin: 14px;
+    }
+
+    .subscription-readonly-banner p {
+        flex-basis: calc(100% - 36px);
+    }
+
+    .subscription-readonly-banner a {
+        margin-left: 36px;
+    }
+}
